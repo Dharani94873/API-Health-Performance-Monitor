@@ -1,0 +1,20 @@
+{
+  "name": "api-health-monitor",
+  "version": "1.0.0",
+  "description": "API Health & Performance Monitor - Full MERN Stack",
+  "scripts": {
+    "install:server": "cd server && npm install",
+    "install:client": "cd client && npm install",
+    "install:all": "npm run install:server && npm run install:client",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "seed": "node seed.js",
+    "build:client": "cd client && npm run build"
+  },
+  "author": "Dharani",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Dharani94873/API-Health-Performance-Monitor"
+  }
+}
