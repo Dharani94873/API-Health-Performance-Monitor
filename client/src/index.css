@@ -2,109 +2,171 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── CSS Variables for theme ──────────────────────── */
+/* ══════════════════════════════════════════════
+   THEME VARIABLES
+   light = default, dark = .dark class on <html>
+══════════════════════════════════════════════ */
 :root {
-  --bg-primary:    #f1f5f9;
-  --bg-secondary:  #ffffff;
-  --bg-card:       rgba(255,255,255,0.8);
-  --bg-card-hover: rgba(255,255,255,0.95);
-  --border:        rgba(0,0,0,0.08);
-  --border-hover:  rgba(0,0,0,0.15);
+  /* backgrounds */
+  --bg-page:       #f0f4f8;
+  --bg-surface:    #ffffff;
+  --bg-elevated:   #ffffff;
+  --bg-card:       rgba(255, 255, 255, 0.9);
+  --bg-card-hover: rgba(255, 255, 255, 1);
+  --bg-input:      #f8fafc;
+  --bg-sidebar:    #1e293b;      /* keep sidebar dark in light mode – looks premium */
+  --bg-topnav:     rgba(255,255,255,0.92);
+
+  /* borders */
+  --border:        rgba(0, 0, 0, 0.08);
+  --border-hover:  rgba(79, 70, 229, 0.4);
+
+  /* text */
   --text-primary:  #0f172a;
   --text-secondary:#475569;
   --text-muted:    #94a3b8;
-  --sidebar-bg:    #ffffff;
-  --topnav-bg:     rgba(255,255,255,0.9);
-  --input-bg:      rgba(0,0,0,0.04);
+  --sidebar-text:  #cbd5e1;
+  --sidebar-muted: #64748b;
+
+  /* misc */
+  --shadow-card:   0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.06);
+  --shadow-hover:  0 4px 12px rgba(79,70,229,0.15), 0 8px 32px rgba(0,0,0,0.08);
   --scrollbar:     #cbd5e1;
-  --tooltip-bg:    rgba(255,255,255,0.97);
+  --tooltip-bg:    rgba(255,255,255,0.98);
   --tooltip-border:rgba(0,0,0,0.1);
+  --tooltip-text:  #0f172a;
 }
 
 .dark {
-  --bg-primary:    #020617;
-  --bg-secondary:  #0f172a;
-  --bg-card:       rgba(255,255,255,0.05);
-  --bg-card-hover: rgba(255,255,255,0.10);
-  --border:        rgba(255,255,255,0.10);
-  --border-hover:  rgba(255,255,255,0.20);
+  --bg-page:       #020617;
+  --bg-surface:    #0f172a;
+  --bg-elevated:   #1e293b;
+  --bg-card:       rgba(255,255,255,0.04);
+  --bg-card-hover: rgba(255,255,255,0.08);
+  --bg-input:      rgba(255,255,255,0.05);
+  --bg-sidebar:    #0f172a;
+  --bg-topnav:     rgba(2,6,23,0.88);
+
+  --border:        rgba(255,255,255,0.08);
+  --border-hover:  rgba(99,102,241,0.5);
+
   --text-primary:  #f1f5f9;
   --text-secondary:#94a3b8;
   --text-muted:    #64748b;
-  --sidebar-bg:    #0f172a;
-  --topnav-bg:     rgba(2,6,23,0.9);
-  --input-bg:      rgba(255,255,255,0.05);
-  --scrollbar:     #475569;
-  --tooltip-bg:    rgba(15,23,42,0.95);
-  --tooltip-border:rgba(255,255,255,0.10);
+  --sidebar-text:  #cbd5e1;
+  --sidebar-muted: #475569;
+
+  --shadow-card:   0 1px 3px rgba(0,0,0,0.4);
+  --shadow-hover:  0 4px 20px rgba(99,102,241,0.2);
+  --scrollbar:     #334155;
+  --tooltip-bg:    rgba(15,23,42,0.96);
+  --tooltip-border:rgba(255,255,255,0.1);
+  --tooltip-text:  #f1f5f9;
 }
 
+/* ══════════════════════════════════════════════
+   BASE STYLES
+══════════════════════════════════════════════ */
 @layer base {
-  * { box-sizing: border-box; }
-
+  *, *::before, *::after { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
 
   body {
     @apply font-sans antialiased;
-    background-color: var(--bg-primary);
+    background-color: var(--bg-page);
     color: var(--text-primary);
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
 
+  /* Make Tailwind dark-class backgrounds use variables */
+  .bg-dark-950 { background-color: var(--bg-page) !important; }
+  .bg-dark-900 { background-color: var(--bg-surface) !important; }
+  .bg-dark-850 { background-color: var(--bg-elevated) !important; }
+  .bg-dark-800 { background-color: var(--bg-elevated) !important; }
+
+  /* Text overrides */
+  .text-white        { color: var(--text-primary) !important; }
+  .text-slate-100    { color: var(--text-primary) !important; }
+  .text-slate-200    { color: var(--text-secondary) !important; }
+  .text-slate-300    { color: var(--text-secondary) !important; }
+  .text-slate-400    { color: var(--text-muted) !important; }
+  .text-slate-500    { color: var(--text-muted) !important; }
+
+  /* In dark mode restore original colors */
+  .dark .text-white     { color: #ffffff !important; }
+  .dark .text-slate-100 { color: #f1f5f9 !important; }
+  .dark .text-slate-200 { color: #e2e8f0 !important; }
+  .dark .text-slate-300 { color: #cbd5e1 !important; }
+  .dark .text-slate-400 { color: #94a3b8 !important; }
+  .dark .text-slate-500 { color: #64748b !important; }
+
+  /* Border overrides */
+  .border-white\/5  { border-color: var(--border) !important; }
+  .border-white\/10 { border-color: var(--border) !important; }
+
+  /* Scrollbar */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track  { background: var(--bg-secondary); }
+  ::-webkit-scrollbar-track  { background: var(--bg-page); }
   ::-webkit-scrollbar-thumb  { background: var(--scrollbar); border-radius: 9999px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 }
 
+/* ══════════════════════════════════════════════
+   COMPONENTS
+══════════════════════════════════════════════ */
 @layer components {
-  /* ── Cards ── */
+  /* Cards */
   .glass-card {
     background: var(--bg-card);
     backdrop-filter: blur(8px);
     border: 1px solid var(--border);
-    @apply rounded-2xl;
-    transition: background 0.3s ease, border 0.3s ease;
+    border-radius: 1rem;
+    box-shadow: var(--shadow-card);
+    transition: background 0.25s ease, box-shadow 0.25s ease;
   }
-
   .glass-card-hover {
     @apply glass-card;
-    transition: background 0.3s ease, border 0.3s ease, transform 0.2s ease;
+    cursor: pointer;
   }
   .glass-card-hover:hover {
     background: var(--bg-card-hover);
     border-color: var(--border-hover);
+    box-shadow: var(--shadow-hover);
   }
 
-  /* ── Buttons ── */
+  /* White/dark bg panels */
+  .bg-white\/5, .bg-white\/10 {
+    background: var(--bg-input) !important;
+  }
+  .dark .bg-white\/5  { background: rgba(255,255,255,0.05) !important; }
+  .dark .bg-white\/10 { background: rgba(255,255,255,0.10) !important; }
+
+  /* Buttons */
   .btn-primary {
     @apply bg-primary-600 hover:bg-primary-700 text-white font-medium px-4 py-2 rounded-xl
            transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed
            focus:outline-none focus:ring-2 focus:ring-primary-500/50;
   }
-
   .btn-secondary {
     background: var(--bg-card);
     border: 1px solid var(--border);
     color: var(--text-secondary);
-    @apply font-medium px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-2
-           focus:outline-none focus:ring-2 focus:ring-primary-500/30;
+    @apply font-medium px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-2;
   }
   .btn-secondary:hover {
-    background: var(--bg-card-hover);
     border-color: var(--border-hover);
     color: var(--text-primary);
+    box-shadow: var(--shadow-card);
   }
-
   .btn-danger {
-    @apply bg-red-600/20 hover:bg-red-600/30 text-red-500 font-medium px-4 py-2 rounded-xl
+    @apply bg-red-500/10 hover:bg-red-500/20 text-red-500 font-medium px-4 py-2 rounded-xl
            border border-red-500/30 transition-all duration-200 flex items-center gap-2;
   }
 
-  /* ── Inputs ── */
+  /* Inputs */
   .input-field {
     width: 100%;
-    background: var(--input-bg);
+    background: var(--bg-input);
     border: 1px solid var(--border);
     color: var(--text-primary);
     @apply rounded-xl px-4 py-3 transition-all duration-200
@@ -113,13 +175,43 @@
   .input-field::placeholder { color: var(--text-muted); }
 
   .label {
-    @apply block text-sm font-medium mb-1.5;
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
     color: var(--text-secondary);
+    margin-bottom: 0.375rem;
   }
 
-  /* ── Stat / Table ── */
-  .stat-card  { @apply glass-card p-6 flex items-start gap-4 animate-fade-in; }
+  /* Stat card */
+  .stat-card { @apply glass-card p-6 flex items-start gap-4 animate-fade-in; }
 
+  /* Status badges */
+  .status-badge    { @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold; }
+  .status-healthy  { @apply status-badge bg-emerald-500/15 text-emerald-600 border border-emerald-500/30; }
+  .status-down     { @apply status-badge bg-red-500/15    text-red-600    border border-red-500/30; }
+  .status-degraded { @apply status-badge bg-amber-500/15  text-amber-600  border border-amber-500/30; }
+  .status-unknown  { @apply status-badge bg-slate-500/15  text-slate-600  border border-slate-500/30; }
+
+  .dark .status-healthy  { @apply text-emerald-400; }
+  .dark .status-down     { @apply text-red-400; }
+  .dark .status-degraded { @apply text-amber-400; }
+  .dark .status-unknown  { @apply text-slate-400; }
+
+  /* Sidebar (always dark-ish for premium look) */
+  .sidebar-link {
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer;
+    color: var(--sidebar-text);
+  }
+  .sidebar-link:hover {
+    background: rgba(255,255,255,0.08);
+    color: #ffffff;
+  }
+  .sidebar-link-active {
+    @apply sidebar-link bg-primary-600/25 border border-primary-500/30;
+    color: #ffffff !important;
+  }
+
+  /* Table */
   .table-header {
     @apply text-left text-xs font-semibold uppercase tracking-wider px-4 py-3;
     color: var(--text-muted);
@@ -129,54 +221,45 @@
     color: var(--text-secondary);
   }
 
-  /* ── Status badges ── */
-  .status-badge   { @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold; }
-  .status-healthy { @apply status-badge bg-emerald-500/20 text-emerald-500 border border-emerald-500/30; }
-  .status-down    { @apply status-badge bg-red-500/20    text-red-500    border border-red-500/30; }
-  .status-degraded{ @apply status-badge bg-amber-500/20  text-amber-500  border border-amber-500/30; }
-  .status-unknown { @apply status-badge bg-slate-500/20  text-slate-500  border border-slate-500/30; }
-
-  /* ── Sidebar ── */
-  .sidebar-link {
-    @apply flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer;
-    color: var(--text-muted);
-  }
-  .sidebar-link:hover {
-    background: var(--bg-card-hover);
-    color: var(--text-primary);
-  }
-  .sidebar-link-active {
-    @apply sidebar-link bg-primary-600/20 border border-primary-500/20;
-    color: var(--text-primary);
-  }
-
-  /* ── Misc ── */
+  /* Misc */
   .gradient-text {
     @apply bg-gradient-to-r from-primary-400 to-violet-400 bg-clip-text text-transparent;
   }
   .pulse-dot { @apply w-2 h-2 rounded-full animate-pulse-dot; }
 }
 
-/* Chart tooltip */
+/* ══════════════════════════════════════════════
+   RECHARTS TOOLTIP
+══════════════════════════════════════════════ */
 .recharts-tooltip-wrapper .recharts-default-tooltip {
   background: var(--tooltip-bg) !important;
   border: 1px solid var(--tooltip-border) !important;
   border-radius: 12px !important;
   padding: 10px 14px !important;
-  color: var(--text-primary) !important;
+  color: var(--tooltip-text) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12) !important;
 }
 
-/* Skeleton */
+/* ══════════════════════════════════════════════
+   SKELETON
+══════════════════════════════════════════════ */
 .skeleton {
-  background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);
+  background: linear-gradient(
+    90deg,
+    var(--bg-card) 25%,
+    var(--bg-card-hover) 50%,
+    var(--bg-card) 75%
+  );
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.5s infinite;
 }
-
 @keyframes skeleton-shimmer {
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
 
+/* ══════════════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════════════ */
 .modal-overlay { animation: fadeIn 0.2s ease; }
 .page-enter    { animation: fadeIn 0.3s ease; }
