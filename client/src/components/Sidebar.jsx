@@ -25,29 +25,30 @@ export default function Sidebar({ isOpen, onClose }) {
 
   return (
     <aside
-      className={`fixed top-0 left-0 h-full w-64 bg-dark-900/95 backdrop-blur-xl border-r border-white/5 z-30
+      className={`fixed top-0 left-0 h-full w-64 z-30
         flex flex-col transition-transform duration-300
         ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}
+      style={{ background: 'var(--sidebar-bg)', borderRight: '1px solid var(--border)' }}
     >
       {/* Logo */}
-      <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
+      <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: '1px solid var(--border)' }}>
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-violet-600 flex items-center justify-center">
             <MdMonitor className="text-white text-lg" />
           </div>
           <div>
-            <p className="text-sm font-bold text-white">API Monitor</p>
-            <p className="text-xs text-slate-500">Health & Performance</p>
+            <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>API Monitor</p>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Health &amp; Performance</p>
           </div>
         </div>
-        <button onClick={onClose} className="lg:hidden text-slate-400 hover:text-white p-1">
+        <button onClick={onClose} className="lg:hidden p-1" style={{ color: 'var(--text-muted)' }}>
           <MdClose size={20} />
         </button>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        <p className="text-xs text-slate-600 uppercase font-semibold tracking-wider px-3 mb-2">Menu</p>
+        <p className="text-xs uppercase font-semibold tracking-wider px-3 mb-2" style={{ color: 'var(--text-muted)' }}>Menu</p>
         {navLinks.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
@@ -64,7 +65,7 @@ export default function Sidebar({ isOpen, onClose }) {
       </nav>
 
       {/* User section */}
-      <div className="px-3 py-4 border-t border-white/5">
+      <div className="px-3 py-4" style={{ borderTop: '1px solid var(--border)' }}>
         <div className="flex items-center gap-3 px-3 py-2 mb-2">
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-violet-600 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
             {user?.avatar ? (
@@ -72,8 +73,8 @@ export default function Sidebar({ isOpen, onClose }) {
             ) : getInitials(user?.name)}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white truncate">{user?.name}</p>
-            <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+            <p className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>{user?.name}</p>
+            <p className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>{user?.email}</p>
           </div>
         </div>
         <button

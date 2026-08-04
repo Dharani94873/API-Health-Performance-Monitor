@@ -33,26 +33,34 @@ export default function TopNav({ onMenuClick }) {
   };
 
   return (
-    <header className="h-16 bg-dark-900/80 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-4 lg:px-6 flex-shrink-0 z-10">
+    <header
+      className="h-16 backdrop-blur-xl flex items-center justify-between px-4 lg:px-6 flex-shrink-0 z-10"
+      style={{ background: 'var(--topnav-bg)', borderBottom: '1px solid var(--border)' }}
+    >
       {/* Left */}
       <div className="flex items-center gap-3">
         <button
           onClick={onMenuClick}
-          className="lg:hidden text-slate-400 hover:text-white p-2 rounded-lg hover:bg-white/5"
+          className="lg:hidden p-2 rounded-lg transition-colors"
+          style={{ color: 'var(--text-muted)' }}
         >
           <MdMenu size={22} />
         </button>
 
         {/* Search */}
         <form onSubmit={handleSearch} className="relative hidden sm:block">
-          <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
+          <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2" size={16} style={{ color: 'var(--text-muted)' }} />
           <input
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search APIs..."
-            className="bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-sm text-slate-300 
-                       placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-primary-500/30 w-52"
+            className="rounded-xl pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 w-52 transition-all"
+            style={{
+              background: 'var(--input-bg)',
+              border: '1px solid var(--border)',
+              color: 'var(--text-primary)',
+            }}
           />
         </form>
       </div>
@@ -62,8 +70,9 @@ export default function TopNav({ onMenuClick }) {
         {/* Theme toggle */}
         <button
           onClick={toggleTheme}
-          className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all"
-          title="Toggle theme"
+          className="p-2 rounded-xl transition-all"
+          style={{ color: 'var(--text-muted)' }}
+          title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
         >
           {isDark ? <MdSunny size={18} /> : <MdNightlight size={18} />}
         </button>
@@ -71,7 +80,8 @@ export default function TopNav({ onMenuClick }) {
         {/* Notifications */}
         <button
           onClick={() => navigate('/notifications')}
-          className="relative p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all"
+          className="relative p-2 rounded-xl transition-all"
+          style={{ color: 'var(--text-muted)' }}
         >
           <MdNotifications size={20} />
           {unreadCount > 0 && (
