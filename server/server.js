@@ -35,8 +35,24 @@ app.use(async (req, res, next) => {
     await connectDB();
     next();
   } catch (err) {
-    res.status(500).json({ success: false, message: 'Database connection failed' });
+    console.error('DB Error:', err.message);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Database connection failed',
+      error: err.message,
+      hasMongoUri: !!process.env.MONGO_URI
+    });
   }
+});
+
+// Debug route - shows env var status (remove after fixing)
+app.get('/api/debug', (req, res) => {
+  res.json({
+    hasMongoUri: !!process.env.MONGO_URI,
+    mongoUriStart: process.env.MONGO_URI ? process.env.MONGO_URI.substring(0, 30) + '...' : 'NOT SET',
+    nodeEnv: process.env.NODE_ENV,
+    isVercel: !!process.env.VERCEL
+  });
 });
 
 // Health Check
