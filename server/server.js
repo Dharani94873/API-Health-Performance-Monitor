@@ -17,9 +17,6 @@ const cronRoutes = require('./routes/cron');
 
 dotenv.config();
 
-// Connect Database
-connectDB();
-
 const app = express();
 
 // Security Middleware
@@ -31,6 +28,16 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(generalLimiter);
+
+// Connect to DB on every request (cached after first connect)
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Database connection failed' });
+  }
+});
 
 // Health Check
 app.get('/', (req, res) => {
