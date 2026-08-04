@@ -115,28 +115,23 @@ npm run dev
 
 ---
 
-## ⚙️ Environment Variables
+### Environment Variables (`.env`)
+When deploying to Vercel, add these to your Project Settings > Environment Variables:
 
-### Backend (`server/.env`)
 ```env
-PORT=5000
 MONGO_URI=mongodb+srv://<user>:<pass>@cluster.mongodb.net/api-monitor
 JWT_SECRET=your_super_secret_key
-JWT_EXPIRE=7d
-NODE_ENV=development
-CLIENT_URL=http://localhost:5173
+NODE_ENV=production
 
-# Optional - Email Notifications
+# Optional - Email Notifications (SMTP)
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USER=your@gmail.com
 EMAIL_PASS=your_app_password
-EMAIL_FROM=API Monitor <your@gmail.com>
-```
+EMAIL_FROM="API Monitor" <your@gmail.com>
 
-### Frontend (`client/.env`)
-```env
-VITE_API_URL=/api
+# Optional - Vercel Cron Security
+CRON_SECRET=a_random_secure_string_for_cron
 ```
 
 ---
@@ -181,21 +176,18 @@ VITE_API_URL=/api
 
 ---
 
-## 🚀 Deployment
+## 🚀 Deployment (Vercel)
 
-### Backend → Render
-1. Connect GitHub repo to [Render](https://render.com)
-2. Set build command: `npm install`
-3. Set start command: `npm start`
-4. Add all environment variables
-5. Deploy!
+This project is configured as a unified deployment on Vercel. Both the React frontend and Node.js backend are hosted in the same Vercel project, and the API monitor uses a Vercel Cron job.
 
-### Frontend → Vercel
-1. Connect GitHub repo to [Vercel](https://vercel.com)
-2. Set root directory: `client`
-3. Framework: Vite
-4. Add `VITE_API_URL=https://your-render-backend.onrender.com/api`
-5. Deploy!
+1. Push your code to GitHub.
+2. Go to your [Vercel Dashboard](https://vercel.com) and click **Add New > Project**.
+3. Import your GitHub repository.
+4. Leave the Framework Preset as **Vite** (Vercel will detect it automatically).
+5. Open the **Environment Variables** section and add all required keys (see the Environment Variables section above).
+6. Click **Deploy**.
+
+> **Note on Vercel Cron Jobs:** Vercel's free Hobby plan limits cron jobs to running once per day. To run the API health checks every minute as intended, you either need a **Vercel Pro plan**, or you can use a free external service like [UptimeRobot](https://uptimerobot.com) to ping `https://your-app-domain.vercel.app/api/cron` every 1 minute.
 
 ---
 
