@@ -19,11 +19,12 @@
       "dest": "/server/server.js"
     },
     {
-      "handle": "filesystem"
+      "src": "/(assets/.*|vite\\.svg)",
+      "dest": "/client/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/"
+      "dest": "/client/index.html"
     }
   ]
 }
