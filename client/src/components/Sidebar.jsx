@@ -29,10 +29,10 @@ export default function Sidebar({ isOpen, onClose }) {
       className={`fixed top-0 left-0 h-full w-64 z-30
         flex flex-col transition-transform duration-300
         ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}
-      style={{ background: 'var(--sidebar-bg)', borderRight: '1px solid var(--border)' }}
+      style={{ background: 'var(--bg-sidebar)', borderRight: '1px solid var(--border-color)' }}
     >
       {/* Logo */}
-      <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: '1px solid var(--border)' }}>
+      <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: '1px solid var(--border-color)' }}>
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-violet-600 flex items-center justify-center">
             <MdMonitor className="text-white text-lg" />
@@ -66,7 +66,7 @@ export default function Sidebar({ isOpen, onClose }) {
       </nav>
 
       {/* User section */}
-      <div className="px-3 py-4" style={{ borderTop: '1px solid var(--border)' }}>
+      <div className="px-3 py-4" style={{ borderTop: '1px solid var(--border-color)' }}>
         <div className="flex items-center gap-3 px-3 py-2 mb-2">
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-violet-600 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
             {user?.avatar ? (

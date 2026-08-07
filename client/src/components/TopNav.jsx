@@ -35,7 +35,7 @@ export default function TopNav({ onMenuClick }) {
   return (
     <header
       className="h-16 backdrop-blur-xl flex items-center justify-between px-4 lg:px-6 flex-shrink-0 z-10"
-      style={{ background: 'var(--topnav-bg)', borderBottom: '1px solid var(--border)' }}
+      style={{ background: 'var(--bg-topnav)', borderBottom: '1px solid var(--border-color)' }}
     >
       {/* Left */}
       <div className="flex items-center gap-3">
@@ -57,8 +57,8 @@ export default function TopNav({ onMenuClick }) {
             placeholder="Search APIs..."
             className="rounded-xl pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 w-52 transition-all"
             style={{
-              background: 'var(--input-bg)',
-              border: '1px solid var(--border)',
+              background: 'var(--bg-input)',
+              border: '1px solid var(--border-color)',
               color: 'var(--text-primary)',
             }}
           />
