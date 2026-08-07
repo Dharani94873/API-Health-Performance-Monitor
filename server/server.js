@@ -14,6 +14,7 @@ const logRoutes = require('./routes/logs');
 const analyticsRoutes = require('./routes/analytics');
 const alertRoutes = require('./routes/alerts');
 const cronRoutes = require('./routes/cron');
+const reportRoutes = require('./routes/reports');
 
 dotenv.config();
 
@@ -67,6 +68,7 @@ app.use('/api/logs', logRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/cron', cronRoutes);
+app.use('/api/reports', reportRoutes);
 
 // Error Handler
 app.use(errorHandler);

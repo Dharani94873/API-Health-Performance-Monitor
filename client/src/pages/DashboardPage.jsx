@@ -99,13 +99,22 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Stat Cards - Extended */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard icon={MdDashboard} label="Total APIs" value={analytics?.totalApis ?? '—'} color="primary" loading={loading} />
-        <StatCard icon={BiSolidCheckCircle} label="Active APIs" value={analytics?.activeApis ?? '—'} color="emerald" loading={loading} />
+        <StatCard icon={BiSolidCheckCircle} label="Healthy APIs" value={analytics?.healthyApis ?? '—'} color="emerald" loading={loading} />
         <StatCard icon={BiSolidXCircle} label="Failed APIs" value={analytics?.failedApis ?? '—'} color="red" loading={loading} />
         <StatCard icon={BiSolidTimer} label="Avg Response" value={analytics ? formatMs(analytics.avgResponseTime) : '—'} color="amber" loading={loading} />
+        <StatCard icon={MdDashboard} label="Requests Today" value={analytics?.todayChecks ?? '—'} color="primary" loading={loading} />
       </div>
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <StatCard icon={BiSolidCheckCircle} label="Avg Uptime" value={analytics ? `${analytics.avgAvailability}%` : '—'} color="emerald" loading={loading} />
+        <StatCard icon={BiSolidTimer} label="Fastest API" value={analytics?.fastestApi?.apiName?.slice(0, 12) || '—'} color="primary" loading={loading} />
+        <StatCard icon={BiSolidTimer} label="Slowest API" value={analytics?.slowestApi?.apiName?.slice(0, 12) || '—'} color="amber" loading={loading} />
+        <StatCard icon={MdDashboard} label="SSL Warnings" value={analytics?.sslWarnings ?? '—'} color={analytics?.sslWarnings > 0 ? 'red' : 'emerald'} loading={loading} />
+        <StatCard icon={BiSolidCheckCircle} label="Health Score" value={analytics?.avgHealthScore !== null ? `${analytics?.avgHealthScore ?? '—'}/100` : '—'} color="primary" loading={loading} />
+      </div>
+
 
       {/* Charts Row */}
       {analytics && (

@@ -1,5 +1,21 @@
 const mongoose = require('mongoose');
 
+const authSchema = new mongoose.Schema({
+  type: {
+    type: String,
+    enum: ['none', 'apiKey', 'bearer', 'basic', 'custom'],
+    default: 'none',
+  },
+  // Encrypted storage for each auth type
+  apiKeyEncrypted: { type: String, default: null },       // "key:value" encrypted
+  apiKeyHeader: { type: String, default: 'X-API-Key' },   // header name for apiKey
+  apiKeyLocation: { type: String, enum: ['header', 'query'], default: 'header' },
+  bearerTokenEncrypted: { type: String, default: null },
+  basicUsernameEncrypted: { type: String, default: null },
+  basicPasswordEncrypted: { type: String, default: null },
+  customHeadersEncrypted: { type: String, default: null }, // JSON string encrypted
+}, { _id: false });
+
 const apiSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -27,16 +43,16 @@ const apiSchema = new mongoose.Schema({
     default: 200,
   },
   timeout: {
-    type: Number, // in milliseconds
+    type: Number,
     default: 5000,
     min: [1000, 'Timeout must be at least 1 second'],
     max: [30000, 'Timeout cannot exceed 30 seconds'],
   },
   interval: {
-    type: Number, // in minutes
+    type: Number,
     default: 5,
     min: [1, 'Interval must be at least 1 minute'],
-    max: [60, 'Interval cannot exceed 60 minutes'],
+    max: [1440, 'Interval cannot exceed 24 hours (1440 minutes)'],
   },
   active: {
     type: Boolean,
@@ -52,26 +68,49 @@ const apiSchema = new mongoose.Schema({
     of: String,
     default: {},
   },
-  tags: [{ type: String, trim: true }],
-  lastChecked: {
-    type: Date,
+  requestBody: {
+    type: String,
     default: null,
   },
+  tags: [{ type: String, trim: true }],
+
+  // Authentication (Feature 1)
+  authentication: { type: authSchema, default: () => ({ type: 'none' }) },
+
+  // Rate limit / Quota tracking (Feature 2)
+  quotaLimit: { type: Number, default: null },
+  quotaRemaining: { type: Number, default: null },
+  quotaReset: { type: Date, default: null },
+  quotaUsed: { type: Number, default: 0 },
+
+  // SSL monitoring (Feature 4)
+  sslValid: { type: Boolean, default: null },
+  sslExpiry: { type: Date, default: null },
+  sslDaysRemaining: { type: Number, default: null },
+  sslIssuer: { type: String, default: null },
+  sslLastChecked: { type: Date, default: null },
+
+  // AI Health Score (Feature 6)
+  healthScore: { type: Number, default: null, min: 0, max: 100 },
+  healthGrade: {
+    type: String,
+    enum: ['Excellent', 'Good', 'Average', 'Poor', null],
+    default: null,
+  },
+
+  // Existing status fields
+  lastChecked: { type: Date, default: null },
   lastStatus: {
     type: String,
     enum: ['healthy', 'degraded', 'down', 'unknown'],
     default: 'unknown',
   },
-  uptimePercentage: {
-    type: Number,
-    default: 0,
-    min: 0,
-    max: 100,
-  },
+  uptimePercentage: { type: Number, default: 0, min: 0, max: 100 },
 }, { timestamps: true });
 
-// Index for fast queries
+// Indexes
 apiSchema.index({ userId: 1, createdAt: -1 });
 apiSchema.index({ active: 1 });
+apiSchema.index({ lastStatus: 1 });
 
 module.exports = mongoose.model('Api', apiSchema);
