@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import PublicRoute from './components/PublicRoute';
 import DashboardLayout from './layouts/DashboardLayout';
 
 // Pages
@@ -24,9 +25,9 @@ export default function App() {
       <AuthProvider>
         <Routes>
           {/* Public */}
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
+          <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+          <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
 
           {/* Protected - Dashboard Layout */}
           <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
