@@ -13,7 +13,10 @@ const TAG_LENGTH = 16;
  * Get encryption key from env, padded/truncated to 32 bytes
  */
 const getKey = () => {
-  const key = process.env.ENCRYPTION_KEY || 'default_key_change_in_production!!';
+  const key = process.env.ENCRYPTION_KEY;
+  if (!key) {
+    throw new Error('FATAL: ENCRYPTION_KEY environment variable is not set. Refusing to encrypt with fallback key.');
+  }
   return Buffer.from(key.padEnd(KEY_LENGTH, '0').slice(0, KEY_LENGTH));
 };
 

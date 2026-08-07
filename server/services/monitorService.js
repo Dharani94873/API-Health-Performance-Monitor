@@ -60,8 +60,9 @@ const buildAuthHeaders = (authentication, url) => {
  */
 const parseRateLimit = (responseHeaders) => {
   const h = responseHeaders;
-  const limit = parseInt(h['x-ratelimit-limit'] || h['x-rate-limit-limit'] || h['ratelimit-limit']) || null;
-  const remaining = parseInt(h['x-ratelimit-remaining'] || h['x-rate-limit-remaining'] || h['ratelimit-remaining']) || null;
+  const parse = (val) => { const n = parseInt(val); return isNaN(n) ? null : n; };
+  const limit = parse(h['x-ratelimit-limit'] || h['x-rate-limit-limit'] || h['ratelimit-limit']);
+  const remaining = parse(h['x-ratelimit-remaining'] || h['x-rate-limit-remaining'] || h['ratelimit-remaining']);
   const reset = h['x-ratelimit-reset'] || h['x-rate-limit-reset'] || h['ratelimit-reset'] || null;
   const retryAfter = parseInt(h['retry-after']) || null;
 
@@ -202,9 +203,15 @@ const checkApi = async (api) => {
     // Response size & error payload
     const responseBodyStr = typeof response.data === 'string' ? response.data : JSON.stringify(response.data || '');
     const payloadSize = Buffer.byteLength(responseBodyStr, 'utf8');
-    const contentLength = parseInt(responseHeaders['content-length']) || payloadSize;
+    const cl = parseInt(responseHeaders['content-length']);
+    const contentLength = isNaN(cl) ? payloadSize : cl;
     const contentType = responseHeaders['content-type'] || null;
     const errorPayload = !success ? (responseBodyStr.length > 2000 ? responseBodyStr.substring(0, 2000) + '...' : responseBodyStr) : null;
+
+    // Fetch last 99 logs to calculate new uptime pct for accurate health score
+    const lastLogs = await Log.find({ apiId: api._id }).sort({ checkedAt: -1 }).limit(99).select('success');
+    const allRecentLogs = [{ success }, ...lastLogs];
+    const newUptimePct = Math.round((allRecentLogs.filter(l => l.success).length / allRecentLogs.length) * 1000) / 10;
 
     // Health score
     const healthScore = calculateHealthScore({
@@ -212,7 +219,7 @@ const checkApi = async (api) => {
       responseTime,
       timeout: api.timeout,
       statusCode: response.status,
-      uptimePct: api.uptimePercentage,
+      uptimePct: newUptimePct,
     });
 
     logData = {
@@ -281,7 +288,11 @@ const checkApi = async (api) => {
       : null;
     const errorPayload = errorBody ? (errorBody.length > 2000 ? errorBody.substring(0, 2000) + '...' : errorBody) : null;
 
-    const healthScore = calculateHealthScore({ success: false, responseTime, timeout: api.timeout, statusCode: error.response?.status || null, uptimePct: api.uptimePercentage });
+    const lastLogs = await Log.find({ apiId: api._id }).sort({ checkedAt: -1 }).limit(99).select('success');
+    const allRecentLogs = [{ success: false }, ...lastLogs];
+    const newUptimePct = Math.round((allRecentLogs.filter(l => l.success).length / allRecentLogs.length) * 1000) / 10;
+
+    const healthScore = calculateHealthScore({ success: false, responseTime, timeout: api.timeout, statusCode: error.response?.status || null, uptimePct: newUptimePct });
 
     logData = {
       ...logData,

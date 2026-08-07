@@ -152,6 +152,11 @@ const getApiAnalytics = async (req, res, next) => {
     const api = await Api.findOne({ _id: req.params.id, userId: req.user._id });
     if (!api) return res.status(404).json({ success: false, message: 'API not found' });
 
+    const safeApi = api.toObject();
+    if (safeApi.authentication) {
+      safeApi.authentication = { type: safeApi.authentication.type };
+    }
+
     const logs = await Log.find({ apiId: req.params.id })
       .sort({ checkedAt: -1 })
       .limit(200)
@@ -193,7 +198,7 @@ const getApiAnalytics = async (req, res, next) => {
 
     res.json({
       success: true,
-      api,
+      api: safeApi,
       stats: { avgLatency, p95Latency, p99Latency, maxLatency, minLatency, uptime, totalChecks: logs.length },
       trend, sizeTrend, quotaHistory, latestHeaders,
       logs: logs.slice(0, 50),

@@ -7,7 +7,7 @@ const { checkSSL } = require('../services/sslService');
 /**
  * Encrypt authentication credentials before storing
  */
-const encryptAuth = (authentication) => {
+const encryptAuth = (authentication, existingAuth = null) => {
   if (!authentication || authentication.type === 'none') {
     return { type: 'none' };
   }
@@ -16,19 +16,19 @@ const encryptAuth = (authentication) => {
 
   switch (authentication.type) {
     case 'apiKey':
-      encrypted.apiKeyEncrypted = encrypt(authentication.apiKey || '');
-      encrypted.apiKeyHeader = authentication.apiKeyHeader || 'X-API-Key';
-      encrypted.apiKeyLocation = authentication.apiKeyLocation || 'header';
+      encrypted.apiKeyEncrypted = authentication.apiKey ? encrypt(authentication.apiKey) : (existingAuth?.apiKeyEncrypted || '');
+      encrypted.apiKeyHeader = authentication.apiKeyHeader || existingAuth?.apiKeyHeader || 'X-API-Key';
+      encrypted.apiKeyLocation = authentication.apiKeyLocation || existingAuth?.apiKeyLocation || 'header';
       break;
     case 'bearer':
-      encrypted.bearerTokenEncrypted = encrypt(authentication.bearerToken || '');
+      encrypted.bearerTokenEncrypted = authentication.bearerToken ? encrypt(authentication.bearerToken) : (existingAuth?.bearerTokenEncrypted || '');
       break;
     case 'basic':
-      encrypted.basicUsernameEncrypted = encrypt(authentication.username || '');
-      encrypted.basicPasswordEncrypted = encrypt(authentication.password || '');
+      encrypted.basicUsernameEncrypted = authentication.username ? encrypt(authentication.username) : (existingAuth?.basicUsernameEncrypted || '');
+      encrypted.basicPasswordEncrypted = authentication.password ? encrypt(authentication.password) : (existingAuth?.basicPasswordEncrypted || '');
       break;
     case 'custom':
-      encrypted.customHeadersEncrypted = encrypt(JSON.stringify(authentication.customHeaders || {}));
+      encrypted.customHeadersEncrypted = (authentication.customHeaders && authentication.customHeaders !== '{}') ? encrypt(typeof authentication.customHeaders === 'string' ? authentication.customHeaders : JSON.stringify(authentication.customHeaders)) : (existingAuth?.customHeadersEncrypted || '');
       break;
   }
 
@@ -90,8 +90,8 @@ const getApis = async (req, res, next) => {
     let sortQuery = {};
     if (sort === '-createdAt') sortQuery = { createdAt: -1 };
     if (sort === 'createdAt') sortQuery = { createdAt: 1 };
-    if (sort === 'fastest') sortQuery = { uptimePercentage: -1 };
-    if (sort === 'slowest') sortQuery = { uptimePercentage: 1 };
+    if (sort === 'fastest') sortQuery = { healthScore: -1 };
+    if (sort === 'slowest') sortQuery = { healthScore: 1 };
 
     const skip = (Number(page) - 1) * Number(limit);
     const total = await Api.countDocuments(query);
@@ -134,10 +134,17 @@ const getApi = async (req, res, next) => {
 // @access  Private
 const updateApi = async (req, res, next) => {
   try {
-    const updateData = { ...req.body };
+    const existingApi = await Api.findOne({ _id: req.params.id, userId: req.user._id });
+    if (!existingApi) return res.status(404).json({ success: false, message: 'API not found' });
+
+    const allowedFields = ['apiName', 'apiUrl', 'method', 'expectedStatus', 'timeout', 'interval', 'description', 'headers', 'tags', 'authentication', 'requestBody', 'maintenance', 'active'];
+    const updateData = {};
+    for (const key of allowedFields) {
+      if (req.body[key] !== undefined) updateData[key] = req.body[key];
+    }
 
     if (updateData.authentication) {
-      updateData.authentication = encryptAuth(updateData.authentication);
+      updateData.authentication = encryptAuth(updateData.authentication, existingApi.authentication);
     }
 
     const api = await Api.findOneAndUpdate(

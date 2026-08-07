@@ -198,7 +198,7 @@ export default function EditApiPage() {
           {auth.type === 'basic' && (
             <div className="grid grid-cols-2 gap-3">
               <div><label className="label"><MdPerson size={12} style={{ display: 'inline', marginRight: 4 }} />Username</label><input name="username" value={auth.username} onChange={handleAuthChange} className="input-field" /></div>
-              <div><label className="label">Password</label><input name="password" value={auth.password} onChange={handleAuthChange} className="input-field" type="password" /></div>
+              <div><label className="label">Password (leave blank to keep existing)</label><input name="password" value={auth.password} onChange={handleAuthChange} className="input-field" type="password" /></div>
             </div>
           )}
           {auth.type === 'custom' && (

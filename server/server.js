@@ -21,6 +21,7 @@ dotenv.config();
 const app = express();
 
 // Security Middleware
+app.set('trust proxy', 1);
 app.use(helmet());
 app.use(cors({
   origin: process.env.CLIENT_URL || '*',
@@ -44,16 +45,6 @@ app.use(async (req, res, next) => {
       hasMongoUri: !!process.env.MONGO_URI
     });
   }
-});
-
-// Debug route - shows env var status (remove after fixing)
-app.get('/api/debug', (req, res) => {
-  res.json({
-    hasMongoUri: !!process.env.MONGO_URI,
-    mongoUriStart: process.env.MONGO_URI ? process.env.MONGO_URI.substring(0, 30) + '...' : 'NOT SET',
-    nodeEnv: process.env.NODE_ENV,
-    isVercel: !!process.env.VERCEL
-  });
 });
 
 // Health Check
