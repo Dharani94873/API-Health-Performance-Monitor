@@ -13,6 +13,14 @@ export default function ProfilePage() {
     slackWebhookUrl: user?.slackWebhookUrl || '',
     discordWebhookUrl: user?.discordWebhookUrl || '',
   });
+  
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [passLoading, setPassLoading] = useState(false);
+  const [passForm, setPassForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirm: ''
+  });
 
   const publicStatusUrl = `${window.location.origin}/status/${user?.id || user?._id}`;
 
