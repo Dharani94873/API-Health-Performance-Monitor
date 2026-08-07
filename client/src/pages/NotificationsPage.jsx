@@ -9,6 +9,8 @@ const TYPE_CONFIG = {
   timeout: { label: 'Timeout', class: 'text-amber-400 bg-amber-500/10 border-amber-500/20' },
   status_mismatch: { label: 'Status Mismatch', class: 'text-orange-400 bg-orange-500/10 border-orange-500/20' },
   recovered: { label: 'Recovered', class: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
+  quota_exhausted: { label: 'Rate Limit / Quota', class: 'text-violet-400 bg-violet-500/10 border-violet-500/20' },
+  ssl_expiring: { label: 'SSL Warning', class: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20' },
 };
 
 export default function NotificationsPage() {
