@@ -71,7 +71,18 @@ export default function DashboardPage() {
   // Filter APIs
   const filteredApis = apis.filter(a => {
     const matchSearch = !search || a.apiName.toLowerCase().includes(search.toLowerCase()) || a.apiUrl.toLowerCase().includes(search.toLowerCase());
-    const matchFilter = filter === 'all' || (filter === 'active' && a.active) || (filter === 'inactive' && !a.active) || (filter === 'healthy' && a.lastStatus === 'healthy') || (filter === 'down' && a.lastStatus === 'down');
+    
+    let matchFilter = true;
+    if (filter === 'active') matchFilter = a.active;
+    else if (filter === 'inactive') matchFilter = !a.active;
+    else if (filter === 'healthy') matchFilter = a.lastStatus === 'healthy';
+    else if (filter === 'down') matchFilter = a.lastStatus === 'down';
+    else if (filter === 'none') matchFilter = !a.authentication || a.authentication.type === 'none';
+    else if (filter === 'apiKey') matchFilter = a.authentication?.type === 'apiKey';
+    else if (filter === 'bearer') matchFilter = a.authentication?.type === 'bearer';
+    else if (filter === 'basic') matchFilter = a.authentication?.type === 'basic';
+    else if (filter === 'custom') matchFilter = a.authentication?.type === 'custom';
+
     return matchSearch && matchFilter;
   });
 
@@ -183,18 +194,32 @@ export default function DashboardPage() {
                 className="bg-white/5 border border-white/10 rounded-lg pl-8 pr-3 py-1.5 text-sm text-slate-300 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-primary-500/30 w-40"
               />
             </div>
-            {/* Filters */}
-            {['all', 'active', 'inactive', 'healthy', 'down'].map(f => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                  filter === f ? 'bg-primary-500/20 text-primary-400 border border-primary-500/30' : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'
-                }`}
-              >
-                {f.charAt(0).toUpperCase() + f.slice(1)}
-              </button>
-            ))}
+            {/* Filters Dropdown */}
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-primary-500/30"
+              style={{
+                background: 'var(--bg-input)',
+                borderColor: 'var(--border-color)',
+                color: 'var(--text-primary)'
+              }}
+            >
+              <optgroup label="Status">
+                <option value="all">All APIs</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="healthy">Healthy</option>
+                <option value="down">Down</option>
+              </optgroup>
+              <optgroup label="Authentication">
+                <option value="none">No Auth</option>
+                <option value="apiKey">API Key</option>
+                <option value="bearer">Bearer Token</option>
+                <option value="basic">Basic Auth</option>
+                <option value="custom">Custom Headers</option>
+              </optgroup>
+            </select>
           </div>
         </div>
 
