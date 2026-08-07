@@ -11,14 +11,17 @@ A production-ready **MERN Stack** application for monitoring API endpoints in re
 ## ✨ Features
 
 - 🔐 **JWT Authentication** — Register, Login, Protected Routes
-- 📡 **API Monitoring Engine** — Automated checks via `node-cron`
-- 📊 **Analytics Dashboard** — Response time trends, uptime charts, success/failure charts
-- 🔔 **Alert System** — Instant alerts on downtime, timeout, status mismatch
-- 📧 **Email Notifications** — Optional Nodemailer integration
-- 🔍 **Search & Filter** — By name, status, active/inactive
-- 📥 **Export** — Logs to CSV
-- 🌙 **Dark Mode** — Default dark theme with toggle
-- 📱 **Responsive** — Mobile-friendly design
+- 🔑 **API Authentication** — Support for API Keys, Bearer Tokens, Basic Auth, and Custom Headers (AES-256-GCM encrypted in DB)
+- 📡 **API Monitoring Engine** — Automated checks via `node-cron` with customizable timeouts and intervals
+- 📈 **Rate Limit Tracking** — Automatically parses quota limits, remaining requests, and reset times from response headers
+- 🔒 **SSL Certificate Monitoring** — Monitors certificate validity and tracks days until expiration
+- 🤖 **AI Health Scores** — Intelligent 0–100 grading based on availability, latency, uptime, and status codes
+- 📊 **Enterprise Analytics** — Weekly/monthly availability, response size trends, fastest/slowest APIs
+- ⚖️ **API Comparison** — Side-by-side radar and bar charts for up to 5 APIs
+- 🔔 **Alert System** — Instant alerts for downtime, timeouts, quota exhaustion, SSL warnings, and status mismatches
+- 🔍 **Headers Inspector** — Detailed breakdown of response headers (Security, Cache, Rate Limits)
+- 📥 **Export** — Download logs and analytical reports as CSV files
+- 🌙 **Dark Mode** — Beautiful dual-theme UI with responsive design
 - 🛡️ **Security** — Helmet, CORS, Rate Limiting, Input Validation
 
 ---
@@ -162,9 +165,11 @@ CRON_SECRET=a_random_secure_string_for_cron
 |--------|----------|-------------|
 | GET | `/api/logs/:apiId` | Get logs for API |
 | GET | `/api/logs` | Get recent logs |
-| GET | `/api/logs/:apiId/export` | Export CSV |
 | GET | `/api/analytics` | Dashboard analytics |
 | GET | `/api/analytics/api/:id` | API-specific analytics |
+| POST | `/api/apis/:id/test` | Run immediate test with detailed headers/body |
+| GET | `/api/apis/compare` | Compare multiple APIs side-by-side |
+| GET | `/api/reports/csv` | Export analytical reports to CSV |
 
 ### Alerts
 | Method | Endpoint | Description |
