@@ -112,9 +112,9 @@ export default function DashboardPage() {
 
       {/* Stat Cards - Extended */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        <StatCard icon={MdDashboard} label="Total APIs" value={analytics?.totalApis ?? '—'} color="primary" loading={loading} />
-        <StatCard icon={BiSolidCheckCircle} label="Healthy APIs" value={analytics?.healthyApis ?? '—'} color="emerald" loading={loading} />
-        <StatCard icon={BiSolidXCircle} label="Failed APIs" value={analytics?.failedApis ?? '—'} color="red" loading={loading} />
+        <StatCard icon={MdDashboard} label="Total APIs" value={filteredApis.length} color="primary" loading={loading} />
+        <StatCard icon={BiSolidCheckCircle} label="Healthy APIs" value={filteredApis.filter(a => a.lastStatus === 'healthy').length} color="emerald" loading={loading} />
+        <StatCard icon={BiSolidXCircle} label="Failed APIs" value={filteredApis.filter(a => a.lastStatus === 'down').length} color="red" loading={loading} />
         <StatCard icon={BiSolidTimer} label="Avg Response" value={analytics ? formatMs(analytics.avgResponseTime) : '—'} color="amber" loading={loading} />
         <StatCard icon={MdDashboard} label="Requests Today" value={analytics?.todayChecks ?? '—'} color="primary" loading={loading} />
       </div>
