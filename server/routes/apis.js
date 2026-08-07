@@ -2,9 +2,12 @@ const express = require('express');
 const router = express.Router();
 const {
   createApi, getApis, getApi, updateApi, deleteApi, toggleApi,
-  testApi, compareApis, getApiSSL,
+  testApi, compareApis, getApiSSL, getPublicStatus,
 } = require('../controllers/apiController');
 const { protect } = require('../middleware/auth');
+
+// Public status route (no auth required)
+router.get('/public/status/:userId', getPublicStatus);
 
 // Compare must be before /:id to avoid route conflict
 router.get('/compare', protect, compareApis);

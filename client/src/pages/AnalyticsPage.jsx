@@ -90,16 +90,18 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
         {[
           { label: 'Total Checks (7d)', value: successCount + failureCount, color: '#6366f1' },
           { label: 'Success Rate', value: `${successCount + failureCount > 0 ? Math.round(successCount / (successCount + failureCount) * 100) : 0}%`, color: '#10b981' },
           { label: 'Avg Response', value: formatMs(analytics?.avgResponseTime), color: '#f59e0b' },
+          { label: 'p95 Response', value: formatMs(analytics?.p95ResponseTime), color: '#ec4899' },
+          { label: 'p99 Response', value: formatMs(analytics?.p99ResponseTime), color: '#ef4444' },
           { label: 'Avg Availability', value: `${analytics?.avgAvailability ?? '—'}%`, color: '#8b5cf6' },
         ].map(({ label, value, color }) => (
-          <div key={label} className="glass-card p-5">
-            <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>{label}</p>
-            <p style={{ fontSize: 20, fontWeight: 700, color }}>{value}</p>
+          <div key={label} className="glass-card p-4">
+            <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>{label}</p>
+            <p style={{ fontSize: 18, fontWeight: 700, color }}>{value}</p>
           </div>
         ))}
       </div>

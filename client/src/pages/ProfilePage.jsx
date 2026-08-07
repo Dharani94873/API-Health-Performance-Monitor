@@ -7,10 +7,19 @@ import { formatDate, getInitials } from '../utils/helpers';
 
 export default function ProfilePage() {
   const { user, updateUser } = useAuth();
-  const [profileForm, setProfileForm] = useState({ name: user?.name || '', emailNotifications: user?.emailNotifications ?? true });
-  const [passForm, setPassForm] = useState({ currentPassword: '', newPassword: '', confirm: '' });
-  const [profileLoading, setProfileLoading] = useState(false);
-  const [passLoading, setPassLoading] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    name: user?.name || '',
+    emailNotifications: user?.emailNotifications ?? true,
+    slackWebhookUrl: user?.slackWebhookUrl || '',
+    discordWebhookUrl: user?.discordWebhookUrl || '',
+  });
+
+  const publicStatusUrl = `${window.location.origin}/status/${user?.id || user?._id}`;
+
+  const copyStatusLink = () => {
+    navigator.clipboard.writeText(publicStatusUrl);
+    toast.success('Public status URL copied to clipboard!');
+  };
 
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
@@ -67,6 +76,28 @@ export default function ProfilePage() {
         </div>
       </div>
 
+      {/* Public Status Page Card */}
+      <div className="glass-card p-6 border border-primary-500/30 space-y-3 bg-primary-500/5">
+        <h3 className="font-semibold text-white flex items-center gap-2">
+          📢 Your Public Status Page
+        </h3>
+        <p className="text-xs text-slate-400">Share your live service health with your team or customers without authentication.</p>
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            readOnly
+            value={publicStatusUrl}
+            className="input-field py-1.5 text-xs text-slate-300 bg-slate-900/60"
+          />
+          <button type="button" onClick={copyStatusLink} className="btn-primary text-xs py-1.5 px-3 whitespace-nowrap">
+            Copy Link
+          </button>
+          <a href={publicStatusUrl} target="_blank" rel="noopener noreferrer" className="btn-secondary text-xs py-1.5 px-3 whitespace-nowrap">
+            Open
+          </a>
+        </div>
+      </div>
+
       {/* Profile Form */}
       <form onSubmit={handleProfileSubmit} className="glass-card p-6 space-y-4">
         <h3 className="font-semibold text-white">Account Information</h3>
@@ -93,6 +124,31 @@ export default function ProfilePage() {
             <input type="email" value={user?.email} className="input-field pl-10 opacity-50 cursor-not-allowed" disabled />
           </div>
           <p className="text-xs text-slate-600 mt-1">Email cannot be changed</p>
+        </div>
+
+        {/* Webhooks Section */}
+        <div className="pt-2 space-y-3">
+          <h4 className="text-sm font-semibold text-white">💬 Webhook Alert Integrations (Free)</h4>
+          <div>
+            <label className="label text-xs">Slack Incoming Webhook URL</label>
+            <input
+              type="url"
+              placeholder="https://hooks.slack.com/services/..."
+              value={profileForm.slackWebhookUrl}
+              onChange={e => setProfileForm(p => ({ ...p, slackWebhookUrl: e.target.value }))}
+              className="input-field text-xs"
+            />
+          </div>
+          <div>
+            <label className="label text-xs">Discord Webhook URL</label>
+            <input
+              type="url"
+              placeholder="https://discord.com/api/webhooks/..."
+              value={profileForm.discordWebhookUrl}
+              onChange={e => setProfileForm(p => ({ ...p, discordWebhookUrl: e.target.value }))}
+              className="input-field text-xs"
+            />
+          </div>
         </div>
 
         {/* Email Notifications Toggle */}

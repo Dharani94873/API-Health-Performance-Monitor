@@ -33,8 +33,24 @@ export default function ApiCard({ api, onDelete, onToggle }) {
             {api.apiName}
           </h3>
           <p className="text-xs text-slate-500 truncate mt-0.5">{truncate(api.apiUrl, 50)}</p>
+
+          {/* Tags */}
+          {api.tags && api.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-2">
+              {api.tags.map(t => (
+                <span key={t} className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-slate-400 border border-white/10">
+                  {t}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
-        {!api.active && (
+        {api.maintenance?.active && (
+          <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded ml-2 flex-shrink-0">
+            Maintenance
+          </span>
+        )}
+        {!api.active && !api.maintenance?.active && (
           <span className="text-xs text-slate-500 bg-slate-500/10 px-2 py-0.5 rounded-full border border-slate-500/20 ml-2 flex-shrink-0">
             Paused
           </span>

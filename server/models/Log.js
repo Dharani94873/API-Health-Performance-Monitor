@@ -24,6 +24,7 @@ const logSchema = new mongoose.Schema({
 
   success: { type: Boolean, required: true },
   errorMessage: { type: String, default: null },
+  errorPayload: { type: String, default: null }, // JSON or text response body on failure
 
   // Response size (Feature 5)
   responseSize: { type: Number, default: null },   // bytes

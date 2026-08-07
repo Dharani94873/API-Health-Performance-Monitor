@@ -98,11 +98,19 @@ const apiSchema = new mongoose.Schema({
     default: null,
   },
 
+  // Maintenance Window
+  maintenance: {
+    active: { type: Boolean, default: false },
+    start: { type: Date, default: null },
+    end: { type: Date, default: null },
+    reason: { type: String, default: '' },
+  },
+
   // Existing status fields
   lastChecked: { type: Date, default: null },
   lastStatus: {
     type: String,
-    enum: ['healthy', 'degraded', 'down', 'unknown'],
+    enum: ['healthy', 'degraded', 'down', 'maintenance', 'unknown'],
     default: 'unknown',
   },
   uptimePercentage: { type: Number, default: 0, min: 0, max: 100 },

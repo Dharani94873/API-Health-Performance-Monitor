@@ -18,6 +18,7 @@ import NotificationsPage from './pages/NotificationsPage';
 import ProfilePage from './pages/ProfilePage';
 import NotFoundPage from './pages/NotFoundPage';
 import CompareApisPage from './pages/CompareApisPage';
+import PublicStatusPage from './pages/PublicStatusPage';
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
           <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
           <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+          <Route path="/status/:userId" element={<PublicStatusPage />} />
 
           {/* Protected - Dashboard Layout */}
           <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>

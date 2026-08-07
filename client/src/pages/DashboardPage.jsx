@@ -68,6 +68,9 @@ export default function DashboardPage() {
     }
   };
 
+  // Unique tags across all APIs
+  const allTags = Array.from(new Set(apis.flatMap(a => a.tags || [])));
+
   // Filter APIs
   const filteredApis = apis.filter(a => {
     const matchSearch = !search || a.apiName.toLowerCase().includes(search.toLowerCase()) || a.apiUrl.toLowerCase().includes(search.toLowerCase());
@@ -77,11 +80,16 @@ export default function DashboardPage() {
     else if (filter === 'inactive') matchFilter = !a.active;
     else if (filter === 'healthy') matchFilter = a.lastStatus === 'healthy';
     else if (filter === 'down') matchFilter = a.lastStatus === 'down';
+    else if (filter === 'maintenance') matchFilter = a.lastStatus === 'maintenance' || a.maintenance?.active;
     else if (filter === 'none') matchFilter = !a.authentication || a.authentication.type === 'none';
     else if (filter === 'apiKey') matchFilter = a.authentication?.type === 'apiKey';
     else if (filter === 'bearer') matchFilter = a.authentication?.type === 'bearer';
     else if (filter === 'basic') matchFilter = a.authentication?.type === 'basic';
     else if (filter === 'custom') matchFilter = a.authentication?.type === 'custom';
+    else if (filter.startsWith('tag:')) {
+      const targetTag = filter.replace('tag:', '');
+      matchFilter = a.tags?.includes(targetTag);
+    }
 
     return matchSearch && matchFilter;
   });
@@ -211,6 +219,7 @@ export default function DashboardPage() {
                 <option value="inactive">Inactive</option>
                 <option value="healthy">Healthy</option>
                 <option value="down">Down</option>
+                <option value="maintenance">Maintenance</option>
               </optgroup>
               <optgroup label="Authentication">
                 <option value="none">No Auth</option>
@@ -219,6 +228,13 @@ export default function DashboardPage() {
                 <option value="basic">Basic Auth</option>
                 <option value="custom">Custom Headers</option>
               </optgroup>
+              {allTags.length > 0 && (
+                <optgroup label="Tags">
+                  {allTags.map(tag => (
+                    <option key={tag} value={`tag:${tag}`}>{tag}</option>
+                  ))}
+                </optgroup>
+              )}
             </select>
           </div>
         </div>

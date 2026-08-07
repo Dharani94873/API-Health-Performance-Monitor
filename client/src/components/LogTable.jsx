@@ -1,7 +1,10 @@
-import { formatDate, formatMs, getStatusClass, getMethodColor } from '../utils/helpers';
-import { MdCheckCircle, MdCancel } from 'react-icons/md';
+import { useState } from 'react';
+import { formatDate, formatMs } from '../utils/helpers';
+import { MdCheckCircle, MdCancel, MdCode, MdClose } from 'react-icons/md';
 
 export default function LogTable({ logs, loading }) {
+  const [selectedPayload, setSelectedPayload] = useState(null);
+
   if (loading) {
     return (
       <div className="space-y-2">
@@ -30,6 +33,7 @@ export default function LogTable({ logs, loading }) {
             <th className="table-header">Code</th>
             <th className="table-header">Response Time</th>
             <th className="table-header">Result</th>
+            <th className="table-header">Payload</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-white/5">
@@ -75,10 +79,55 @@ export default function LogTable({ logs, loading }) {
                   <span className="text-xs text-emerald-400">OK</span>
                 )}
               </td>
+              <td className="table-cell">
+                {log.errorPayload ? (
+                  <button
+                    onClick={() => setSelectedPayload({ payload: log.errorPayload, code: log.statusCode, time: log.checkedAt })}
+                    className="flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-all"
+                  >
+                    <MdCode size={12} /> View Error Body
+                  </button>
+                ) : (
+                  <span className="text-xs text-slate-600">—</span>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {/* Error Payload Modal */}
+      {selectedPayload && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
+          <div className="glass-card max-w-2xl w-full p-6 space-y-4 border border-slate-700 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div>
+                <h3 className="font-bold text-white text-base">Error Response Body</h3>
+                <p className="text-xs text-slate-400">Captured Status Code: {selectedPayload.code || 'N/A'}</p>
+              </div>
+              <button
+                onClick={() => setSelectedPayload(null)}
+                className="p-1 text-slate-400 hover:text-white rounded-lg transition-colors"
+              >
+                <MdClose size={20} />
+              </button>
+            </div>
+
+            <pre className="p-4 bg-slate-900 rounded-xl text-xs font-mono text-slate-300 overflow-x-auto max-h-80 border border-slate-800 whitespace-pre-wrap break-all">
+              {selectedPayload.payload}
+            </pre>
+
+            <div className="flex justify-end">
+              <button
+                onClick={() => setSelectedPayload(null)}
+                className="btn-secondary text-xs px-4 py-1.5"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

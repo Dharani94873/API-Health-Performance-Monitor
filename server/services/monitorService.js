@@ -115,15 +115,61 @@ const getHealthGrade = (score) => {
 };
 
 /**
+ * Send Slack & Discord Webhooks
+ */
+const sendWebhooks = async (userId, apiName, message, type) => {
+  try {
+    const user = await User.findById(userId);
+    if (!user) return;
+
+    if (user.slackWebhookUrl) {
+      axios.post(user.slackWebhookUrl, {
+        text: `🚨 *API Alert:* ${apiName}\n*Status:* ${message}\n*Type:* ${type}`,
+      }).catch(() => {});
+    }
+
+    if (user.discordWebhookUrl) {
+      axios.post(user.discordWebhookUrl, {
+        embeds: [{
+          title: `🚨 API Alert: ${apiName}`,
+          description: message,
+          color: type === 'down' ? 15158332 : 16776960,
+          fields: [{ name: 'Type', value: type, inline: true }],
+          timestamp: new Date().toISOString(),
+        }]
+      }).catch(() => {});
+    }
+  } catch (err) {
+    console.error('Webhook dispatch error:', err.message);
+  }
+};
+
+/**
  * Check a single API and store the result
  */
 const checkApi = async (api) => {
   const startTime = Date.now();
+  const now = new Date();
+
+  // Maintenance Window Check
+  if (api.maintenance?.active) {
+    const start = api.maintenance.start ? new Date(api.maintenance.start) : null;
+    const end = api.maintenance.end ? new Date(api.maintenance.end) : null;
+    const inWindow = (!start || now >= start) && (!end || now <= end);
+    if (inWindow) {
+      await Api.findByIdAndUpdate(api._id, {
+        lastChecked: now,
+        lastStatus: 'maintenance',
+      });
+      return;
+    }
+  }
+
   let logData = {
     apiId: api._id,
     userId: api.userId,
     success: false,
-    checkedAt: new Date(),
+    checkedAt: now,
   };
 
   try {
@@ -153,11 +199,12 @@ const checkApi = async (api) => {
     const responseHeaders = response.headers || {};
     const rateLimit = parseRateLimit(responseHeaders);
 
-    // Response size
+    // Response size & error payload
     const responseBodyStr = typeof response.data === 'string' ? response.data : JSON.stringify(response.data || '');
     const payloadSize = Buffer.byteLength(responseBodyStr, 'utf8');
     const contentLength = parseInt(responseHeaders['content-length']) || payloadSize;
     const contentType = responseHeaders['content-type'] || null;
+    const errorPayload = !success ? (responseBodyStr.length > 2000 ? responseBodyStr.substring(0, 2000) + '...' : responseBodyStr) : null;
 
     // Health score
     const healthScore = calculateHealthScore({
@@ -181,6 +228,7 @@ const checkApi = async (api) => {
       rateLimit,
       healthScore,
       errorMessage: success ? null : `Expected ${api.expectedStatus}, got ${response.status}`,
+      errorPayload,
     };
 
     // Update API status fields
@@ -228,14 +276,20 @@ const checkApi = async (api) => {
       alertType = 'timeout';
     }
 
-    const healthScore = calculateHealthScore({ success: false, responseTime, timeout: api.timeout, statusCode: null, uptimePct: api.uptimePercentage });
+    const errorBody = error.response?.data
+      ? (typeof error.response.data === 'string' ? error.response.data : JSON.stringify(error.response.data))
+      : null;
+    const errorPayload = errorBody ? (errorBody.length > 2000 ? errorBody.substring(0, 2000) + '...' : errorBody) : null;
+
+    const healthScore = calculateHealthScore({ success: false, responseTime, timeout: api.timeout, statusCode: error.response?.status || null, uptimePct: api.uptimePercentage });
 
     logData = {
       ...logData,
-      statusCode: null,
+      statusCode: error.response?.status || null,
       responseTime,
       success: false,
       errorMessage,
+      errorPayload,
       healthScore,
     };
 
@@ -246,7 +300,7 @@ const checkApi = async (api) => {
       healthGrade: getHealthGrade(healthScore),
     });
 
-    await createAlert(api, errorMessage, alertType, null);
+    await createAlert(api, errorMessage, alertType, error.response?.status || null);
   }
 
   // Save log
@@ -364,6 +418,9 @@ const createAlert = async (api, message, type, statusCode) => {
       type,
       statusCode,
     });
+
+    // Dispatch Slack & Discord Webhooks
+    sendWebhooks(api.userId, api.apiName, message, type).catch(() => {});
 
     if (process.env.EMAIL_USER) {
       try {

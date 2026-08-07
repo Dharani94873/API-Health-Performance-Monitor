@@ -58,8 +58,13 @@ export default function EditApiPage() {
     e.preventDefault();
     setLoading(true);
     try {
+      const tagsArray = typeof form.tags === 'string' 
+        ? form.tags.split(',').map(t => t.trim()).filter(Boolean)
+        : (Array.isArray(form.tags) ? form.tags : []);
+
       await api.put(`/apis/${id}`, {
         ...form,
+        tags: tagsArray,
         expectedStatus: Number(form.expectedStatus),
         timeout: Number(form.timeout),
         interval: Number(form.interval),
@@ -108,6 +113,46 @@ export default function EditApiPage() {
               <label className="label">Description</label>
               <textarea name="description" value={form.description || ''} onChange={handleChange} className="input-field resize-none" rows={2} />
             </div>
+            <div>
+              <label className="label">Tags (comma separated)</label>
+              <input type="text" name="tags" value={Array.isArray(form.tags) ? form.tags.join(', ') : (form.tags || '')} onChange={handleChange} className="input-field" placeholder="Production, Auth, Payment" />
+            </div>
+          </div>
+        </div>
+
+        <Divider />
+
+        {/* Maintenance Window (Feature 4) */}
+        <div>
+          <SectionTitle>🛑 Maintenance Window</SectionTitle>
+          <div className="p-4 bg-white/3 rounded-xl space-y-3 border border-white/10">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-200">Active Maintenance Window</p>
+                <p className="text-xs text-slate-400">Pauses health checks & alert emails during scheduled downtime</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.maintenance?.active || false}
+                  onChange={(e) => setForm(f => ({ ...f, maintenance: { ...(f.maintenance || {}), active: e.target.checked } }))}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-white/10 rounded-full peer peer-checked:bg-amber-600 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full" />
+              </label>
+            </div>
+            {form.maintenance?.active && (
+              <div>
+                <label className="label text-xs">Reason / Details</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Database migration"
+                  value={form.maintenance?.reason || ''}
+                  onChange={(e) => setForm(f => ({ ...f, maintenance: { ...(f.maintenance || {}), reason: e.target.value } }))}
+                  className="input-field text-xs"
+                />
+              </div>
+            )}
           </div>
         </div>
 

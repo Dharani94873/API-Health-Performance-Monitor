@@ -58,6 +58,7 @@ export default function AddApiPage() {
         expectedStatus: Number(form.expectedStatus),
         timeout: Number(form.timeout),
         interval: Number(form.interval),
+        tags: form.tags ? form.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
         authentication: auth,
         requestBody: form.requestBody || null,
       });
@@ -96,6 +97,10 @@ export default function AddApiPage() {
             <div>
               <label className="label">Description</label>
               <textarea name="description" value={form.description} onChange={handleChange} className="input-field resize-none" rows={2} placeholder="Optional description..." />
+            </div>
+            <div>
+              <label className="label">Tags (comma separated)</label>
+              <input type="text" name="tags" value={form.tags || ''} onChange={handleChange} className="input-field" placeholder="Production, Auth, Payment" />
             </div>
           </div>
         </div>

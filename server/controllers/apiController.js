@@ -267,4 +267,32 @@ const getApiSSL = async (req, res, next) => {
   }
 };
 
-module.exports = { createApi, getApis, getApi, updateApi, deleteApi, toggleApi, testApi, compareApis, getApiSSL };
+// @desc    Get public status page data for a user
+// @route   GET /api/apis/public/status/:userId
+// @access  Public
+const getPublicStatus = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const User = require('../models/User');
+    const user = await User.findById(userId).select('name avatar');
+    if (!user) return res.status(404).json({ success: false, message: 'User status page not found' });
+
+    const apis = await Api.find({ userId, active: true }).select('apiName method lastStatus uptimePercentage healthScore healthGrade lastChecked tags description maintenance');
+
+    const overallOperational = apis.every(a => a.lastStatus === 'healthy' || a.lastStatus === 'maintenance');
+    const anyDown = apis.some(a => a.lastStatus === 'down');
+    const systemStatus = anyDown ? 'Major Outage' : overallOperational ? 'All Systems Operational' : 'Partial Outage / Degraded';
+
+    res.json({
+      success: true,
+      user: { name: user.name, avatar: user.avatar },
+      systemStatus,
+      apis,
+      updatedAt: new Date(),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { createApi, getApis, getApi, updateApi, deleteApi, toggleApi, testApi, compareApis, getApiSSL, getPublicStatus };

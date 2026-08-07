@@ -116,13 +116,20 @@ const getAnalytics = async (req, res, next) => {
     }
     apiPerformance.sort((a, b) => a.avgRT - b.avgRT);
 
+    // Calculate p95 and p99
+    const sortedTimes = recentLogs.map(l => l.responseTime).filter(t => t !== null).sort((a, b) => a - b);
+    const p95Idx = Math.floor(sortedTimes.length * 0.95);
+    const p99Idx = Math.floor(sortedTimes.length * 0.99);
+    const p95ResponseTime = sortedTimes.length ? sortedTimes[p95Idx] || sortedTimes[sortedTimes.length - 1] : 0;
+    const p99ResponseTime = sortedTimes.length ? sortedTimes[p99Idx] || sortedTimes[sortedTimes.length - 1] : 0;
+
     const lastLog = await Log.findOne({ userId }).sort({ checkedAt: -1 }).select('checkedAt');
 
     res.json({
       success: true,
       analytics: {
         totalApis, activeApis, failedApis, healthyApis,
-        avgResponseTime, todayChecks, avgHealthScore,
+        avgResponseTime, p95ResponseTime, p99ResponseTime, todayChecks, avgHealthScore,
         avgAvailability, sslWarnings, totalQuotaRemaining,
         lastChecked: lastLog?.checkedAt || null,
         successCount, failureCount,
@@ -148,14 +155,16 @@ const getApiAnalytics = async (req, res, next) => {
     const logs = await Log.find({ apiId: req.params.id })
       .sort({ checkedAt: -1 })
       .limit(200)
-      .select('statusCode responseTime success checkedAt errorMessage responseSize contentType rateLimit healthScore responseHeaders');
+      .select('statusCode responseTime success checkedAt errorMessage responseSize contentType rateLimit healthScore responseHeaders errorPayload');
 
     const successLogs = logs.filter(l => l.success);
-    const responseTimes = successLogs.map(l => l.responseTime).filter(Boolean);
+    const responseTimes = successLogs.map(l => l.responseTime).filter(Boolean).sort((a, b) => a - b);
 
     const avgLatency = responseTimes.length ? Math.round(responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length) : 0;
     const maxLatency = responseTimes.length ? Math.max(...responseTimes) : 0;
     const minLatency = responseTimes.length ? Math.min(...responseTimes) : 0;
+    const p95Latency = responseTimes.length ? responseTimes[Math.floor(responseTimes.length * 0.95)] || responseTimes[responseTimes.length - 1] : 0;
+    const p99Latency = responseTimes.length ? responseTimes[Math.floor(responseTimes.length * 0.99)] || responseTimes[responseTimes.length - 1] : 0;
     const uptime = logs.length > 0 ? Math.round((successLogs.length / logs.length) * 100 * 10) / 10 : 100;
 
     const sizeTrend = successLogs.filter(l => l.responseSize).slice(0, 50).reverse().map((l, i) => ({
@@ -185,7 +194,7 @@ const getApiAnalytics = async (req, res, next) => {
     res.json({
       success: true,
       api,
-      stats: { avgLatency, maxLatency, minLatency, uptime, totalChecks: logs.length },
+      stats: { avgLatency, p95Latency, p99Latency, maxLatency, minLatency, uptime, totalChecks: logs.length },
       trend, sizeTrend, quotaHistory, latestHeaders,
       logs: logs.slice(0, 50),
     });

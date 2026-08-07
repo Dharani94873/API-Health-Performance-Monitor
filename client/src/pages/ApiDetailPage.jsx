@@ -116,16 +116,17 @@ export default function ApiDetailPage() {
       </div>
 
       {/* Stats row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 10 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: 10 }}>
         {[
           { label: 'Uptime', value: `${stats.uptime}%`, color: uptimeColor },
           { label: 'Avg Latency', value: formatMs(stats.avgLatency), color: '#6366f1' },
-          { label: 'Min Latency', value: formatMs(stats.minLatency), color: '#10b981' },
-          { label: 'Max Latency', value: formatMs(stats.maxLatency), color: '#ef4444' },
+          { label: 'p95 Latency', value: formatMs(stats.p95Latency), color: '#ec4899' },
+          { label: 'p99 Latency', value: formatMs(stats.p99Latency), color: '#ef4444' },
+          { label: 'Min / Max', value: `${formatMs(stats.minLatency)} / ${formatMs(stats.maxLatency)}`, color: '#10b981' },
           { label: 'Total Checks', value: stats.totalChecks, color: '#f59e0b' },
         ].map(({ label, value, color }) => (
           <div key={label} className="glass-card p-4" style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: 22, fontWeight: 700, color, marginBottom: 2 }}>{value}</p>
+            <p style={{ fontSize: 18, fontWeight: 700, color, marginBottom: 2 }}>{value}</p>
             <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>{label}</p>
           </div>
         ))}

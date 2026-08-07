@@ -35,6 +35,16 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  slackWebhookUrl: {
+    type: String,
+    default: '',
+    trim: true,
+  },
+  discordWebhookUrl: {
+    type: String,
+    default: '',
+    trim: true,
+  },
 }, { timestamps: true });
 
 // Hash password before save

@@ -93,6 +93,8 @@ const getProfile = async (req, res, next) => {
         avatar: user.avatar,
         role: user.role,
         emailNotifications: user.emailNotifications,
+        slackWebhookUrl: user.slackWebhookUrl || '',
+        discordWebhookUrl: user.discordWebhookUrl || '',
         createdAt: user.createdAt,
       },
     });
@@ -106,10 +108,10 @@ const getProfile = async (req, res, next) => {
 // @access  Private
 const updateProfile = async (req, res, next) => {
   try {
-    const { name, emailNotifications, avatar } = req.body;
+    const { name, emailNotifications, avatar, slackWebhookUrl, discordWebhookUrl } = req.body;
     const user = await User.findByIdAndUpdate(
       req.user._id,
-      { name, emailNotifications, avatar },
+      { name, emailNotifications, avatar, slackWebhookUrl, discordWebhookUrl },
       { new: true, runValidators: true }
     );
     res.json({
@@ -122,6 +124,8 @@ const updateProfile = async (req, res, next) => {
         avatar: user.avatar,
         role: user.role,
         emailNotifications: user.emailNotifications,
+        slackWebhookUrl: user.slackWebhookUrl || '',
+        discordWebhookUrl: user.discordWebhookUrl || '',
         createdAt: user.createdAt,
       },
     });
