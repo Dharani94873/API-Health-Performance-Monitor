@@ -11,14 +11,14 @@ export default function ApiCard({ api, onDelete, onToggle }) {
   return (
     <div
       className="glass-card p-5 cursor-pointer hover:border-white/20 transition-all duration-300 group animate-fade-in"
-      onClick={() => navigate(`/apis/${api._id}`)}
+      onClick={() => navigate(api.isAI ? `/ai-providers/${api._id}` : `/apis/${api._id}`)}
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <span className={`inline-block px-2 py-0.5 rounded-md text-xs font-bold ${getMethodColor(api.method)}`}>
-              {api.method}
+              {api.isAI ? '🤖 AI' : api.method}
             </span>
             <span className={getStatusClass(api.lastStatus)}>
               <span className={`pulse-dot ${
@@ -81,7 +81,7 @@ export default function ApiCard({ api, onDelete, onToggle }) {
         </div>
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
-            onClick={(e) => { e.stopPropagation(); navigate(`/apis/${api._id}/edit`); }}
+            onClick={(e) => { e.stopPropagation(); navigate(api.isAI ? `/ai-providers/${api._id}/edit` : `/apis/${api._id}/edit`); }}
             className="p-1.5 text-slate-400 hover:text-primary-400 hover:bg-primary-500/10 rounded-lg transition-all"
             title="Edit"
           >

@@ -82,6 +82,7 @@ export const getMethodColor = (method) => {
     DELETE: 'text-red-400 bg-red-500/10',
     HEAD: 'text-purple-400 bg-purple-500/10',
     OPTIONS: 'text-slate-400 bg-slate-500/10',
+    AI: 'text-violet-300 bg-violet-500/20 border border-violet-500/30',
   };
   return map[method] || 'text-slate-400 bg-slate-500/10';
 };

@@ -1,5 +1,7 @@
 const Log = require('../models/Log');
 const Api = require('../models/Api');
+const AIProvider = require('../models/AIProvider');
+const AIUsageLog = require('../models/AIUsageLog');
 
 // @desc    Get analytics data
 // @route   GET /api/analytics
@@ -10,41 +12,71 @@ const getAnalytics = async (req, res, next) => {
     const now = new Date();
     const todayStart = new Date(now.setHours(0, 0, 0, 0));
 
-    const apis = await Api.find({ userId });
+    const [apis, aiProviders] = await Promise.all([
+      Api.find({ userId }),
+      AIProvider.find({ userId }),
+    ]);
 
-    const totalApis = apis.length;
-    const activeApis = apis.filter(a => a.active).length;
-    const failedApis = apis.filter(a => a.lastStatus === 'down').length;
-    const healthyApis = apis.filter(a => a.lastStatus === 'healthy').length;
+    const totalApis = apis.length + aiProviders.length;
+    const activeApis = apis.filter(a => a.active).length + aiProviders.filter(p => p.monitoringEnabled).length;
+    const failedApis = apis.filter(a => a.lastStatus === 'down').length + aiProviders.filter(p => p.lastStatus === 'down').length;
+    const healthyApis = apis.filter(a => a.lastStatus === 'healthy').length + aiProviders.filter(p => p.lastStatus === 'healthy').length;
     const sslWarnings = apis.filter(a => a.sslDaysRemaining !== null && a.sslDaysRemaining <= 30).length;
 
     const apisWithQuota = apis.filter(a => a.quotaLimit && a.quotaRemaining !== null);
     const totalQuotaRemaining = apisWithQuota.reduce((s, a) => s + (a.quotaRemaining || 0), 0);
 
-    const todayChecks = await Log.countDocuments({ userId, checkedAt: { $gte: todayStart } });
+    const [todayChecksStandard, todayChecksAI] = await Promise.all([
+      Log.countDocuments({ userId, checkedAt: { $gte: todayStart } }),
+      AIUsageLog.countDocuments({ userId, checkedAt: { $gte: todayStart } }),
+    ]);
+    const todayChecks = todayChecksStandard + todayChecksAI;
 
-    const apisWithScore = apis.filter(a => a.healthScore !== null);
-    const avgHealthScore = apisWithScore.length
-      ? Math.round(apisWithScore.reduce((s, a) => s + a.healthScore, 0) / apisWithScore.length)
+    const allScored = [
+      ...apis.filter(a => a.healthScore !== null).map(a => a.healthScore),
+      ...aiProviders.filter(p => p.healthScore !== null).map(p => p.healthScore),
+    ];
+    const avgHealthScore = allScored.length
+      ? Math.round(allScored.reduce((s, score) => s + score, 0) / allScored.length)
       : null;
 
-    const recentLogs = await Log.find({
-      userId,
-      success: true,
-      checkedAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
-    }).select('responseTime apiId responseSize');
+    const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const [recentStandardLogs, recentAILogs] = await Promise.all([
+      Log.find({ userId, success: true, checkedAt: { $gte: since24h } })
+        .select('responseTime apiId responseSize checkedAt success'),
+      AIUsageLog.find({ userId, success: true, checkedAt: { $gte: since24h } })
+        .select('responseTime aiProviderId responseSize checkedAt success'),
+    ]);
+
+    const recentLogs = [
+      ...recentStandardLogs.map(l => ({ responseTime: l.responseTime, apiId: String(l.apiId), responseSize: l.responseSize, checkedAt: l.checkedAt, success: l.success })),
+      ...recentAILogs.map(l => ({ responseTime: l.responseTime, apiId: String(l.aiProviderId), responseSize: l.responseSize, checkedAt: l.checkedAt, success: l.success })),
+    ];
 
     const avgResponseTime = recentLogs.length
       ? Math.round(recentLogs.reduce((s, l) => s + (l.responseTime || 0), 0) / recentLogs.length)
       : 0;
 
-    const avgAvailability = apis.length
-      ? Math.round(apis.reduce((s, a) => s + (a.uptimePercentage || 0), 0) / apis.length * 10) / 10
+    const allUptimes = [
+      ...apis.map(a => a.uptimePercentage || 0),
+      ...aiProviders.map(p => p.uptimePercentage || 0),
+    ];
+    const avgAvailability = allUptimes.length
+      ? Math.round(allUptimes.reduce((s, u) => s + u, 0) / allUptimes.length * 10) / 10
       : 0;
 
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const weekLogs = await Log.find({ userId, checkedAt: { $gte: weekAgo } })
-      .select('success checkedAt responseTime apiId responseSize rateLimit healthScore');
+    const [weekStandardLogs, weekAILogs] = await Promise.all([
+      Log.find({ userId, checkedAt: { $gte: weekAgo } })
+        .select('success checkedAt responseTime apiId responseSize rateLimit healthScore'),
+      AIUsageLog.find({ userId, checkedAt: { $gte: weekAgo } })
+        .select('success checkedAt responseTime aiProviderId responseSize rateLimits'),
+    ]);
+
+    const weekLogs = [
+      ...weekStandardLogs.map(l => ({ ...l.toObject(), apiId: String(l.apiId) })),
+      ...weekAILogs.map(l => ({ ...l.toObject(), apiId: String(l.aiProviderId) })),
+    ];
 
     const successCount = weekLogs.filter(l => l.success).length;
     const failureCount = weekLogs.filter(l => !l.success).length;
@@ -77,7 +109,11 @@ const getAnalytics = async (req, res, next) => {
     for (let i = 3; i >= 0; i--) {
       const wStart = new Date(Date.now() - (i + 1) * 7 * 24 * 60 * 60 * 1000);
       const wEnd = new Date(Date.now() - i * 7 * 24 * 60 * 60 * 1000);
-      const wLogs = await Log.find({ userId, checkedAt: { $gte: wStart, $lte: wEnd } }).select('success responseTime');
+      const [wStandard, wAI] = await Promise.all([
+        Log.find({ userId, checkedAt: { $gte: wStart, $lte: wEnd } }).select('success responseTime'),
+        AIUsageLog.find({ userId, checkedAt: { $gte: wStart, $lte: wEnd } }).select('success responseTime'),
+      ]);
+      const wLogs = [...wStandard, ...wAI];
       const wSuccess = wLogs.filter(l => l.success);
       weeklyPerformance.push({
         week: `Week ${4 - i}`,
@@ -96,7 +132,11 @@ const getAnalytics = async (req, res, next) => {
       mStart.setHours(0, 0, 0, 0);
       const mEnd = new Date(mStart);
       mEnd.setMonth(mEnd.getMonth() + 1);
-      const mLogs = await Log.find({ userId, checkedAt: { $gte: mStart, $lte: mEnd } }).select('success');
+      const [mStandard, mAI] = await Promise.all([
+        Log.find({ userId, checkedAt: { $gte: mStart, $lte: mEnd } }).select('success'),
+        AIUsageLog.find({ userId, checkedAt: { $gte: mStart, $lte: mEnd } }).select('success'),
+      ]);
+      const mLogs = [...mStandard, ...mAI];
       const mSuccess = mLogs.filter(l => l.success);
       monthlyAvailability.push({
         month: mStart.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }),
@@ -105,25 +145,38 @@ const getAnalytics = async (req, res, next) => {
       });
     }
 
-    // Fastest and Slowest APIs
+    // Fastest and Slowest APIs (both REST and AI)
     const apiPerformance = [];
     for (const api of apis) {
-      const apiLogs = recentLogs.filter(l => String(l.apiId) === String(api._id));
+      const apiLogs = recentLogs.filter(l => l.apiId === String(api._id));
       if (apiLogs.length > 0) {
         const avgRT = Math.round(apiLogs.reduce((s, l) => s + (l.responseTime || 0), 0) / apiLogs.length);
-        apiPerformance.push({ apiId: api._id, apiName: api.apiName, avgRT, lastStatus: api.lastStatus, healthScore: api.healthScore });
+        apiPerformance.push({ apiId: api._id, apiName: api.apiName, avgRT, lastStatus: api.lastStatus, healthScore: api.healthScore, isAI: false });
+      }
+    }
+    for (const provider of aiProviders) {
+      const providerLogs = recentLogs.filter(l => l.apiId === String(provider._id));
+      if (providerLogs.length > 0) {
+        const avgRT = Math.round(providerLogs.reduce((s, l) => s + (l.responseTime || 0), 0) / providerLogs.length);
+        apiPerformance.push({ apiId: provider._id, apiName: provider.providerName, avgRT, lastStatus: provider.lastStatus, healthScore: provider.healthScore, isAI: true });
+      } else if (provider.lastResponseTime) {
+        apiPerformance.push({ apiId: provider._id, apiName: provider.providerName, avgRT: provider.lastResponseTime, lastStatus: provider.lastStatus, healthScore: provider.healthScore, isAI: true });
       }
     }
     apiPerformance.sort((a, b) => a.avgRT - b.avgRT);
 
     // Calculate p95 and p99
-    const sortedTimes = recentLogs.map(l => l.responseTime).filter(t => t !== null).sort((a, b) => a - b);
+    const sortedTimes = recentLogs.map(l => l.responseTime).filter(t => t !== null && t !== undefined).sort((a, b) => a - b);
     const p95Idx = Math.floor(sortedTimes.length * 0.95);
     const p99Idx = Math.floor(sortedTimes.length * 0.99);
     const p95ResponseTime = sortedTimes.length ? sortedTimes[p95Idx] || sortedTimes[sortedTimes.length - 1] : 0;
     const p99ResponseTime = sortedTimes.length ? sortedTimes[p99Idx] || sortedTimes[sortedTimes.length - 1] : 0;
 
-    const lastLog = await Log.findOne({ userId }).sort({ checkedAt: -1 }).select('checkedAt');
+    const [lastLogStandard, lastLogAI] = await Promise.all([
+      Log.findOne({ userId }).sort({ checkedAt: -1 }).select('checkedAt'),
+      AIUsageLog.findOne({ userId }).sort({ checkedAt: -1 }).select('checkedAt'),
+    ]);
+    const latestCheck = [lastLogStandard?.checkedAt, lastLogAI?.checkedAt].filter(Boolean).sort((a, b) => new Date(b) - new Date(a))[0] || null;
 
     res.json({
       success: true,
@@ -131,7 +184,7 @@ const getAnalytics = async (req, res, next) => {
         totalApis, activeApis, failedApis, healthyApis,
         avgResponseTime, p95ResponseTime, p99ResponseTime, todayChecks, avgHealthScore,
         avgAvailability, sslWarnings, totalQuotaRemaining,
-        lastChecked: lastLog?.checkedAt || null,
+        lastChecked: latestCheck,
         successCount, failureCount,
         fastestApi: apiPerformance[0] || null,
         slowestApi: apiPerformance[apiPerformance.length - 1] || null,
@@ -144,23 +197,63 @@ const getAnalytics = async (req, res, next) => {
   }
 };
 
-// @desc    Get API-wise performance
+// @desc    Get API-wise performance (supports both standard APIs and AI providers)
 // @route   GET /api/analytics/api/:id
 // @access  Private
 const getApiAnalytics = async (req, res, next) => {
   try {
-    const api = await Api.findOne({ _id: req.params.id, userId: req.user._id });
-    if (!api) return res.status(404).json({ success: false, message: 'API not found' });
+    let api = await Api.findOne({ _id: req.params.id, userId: req.user._id });
+    let isAI = false;
+
+    if (!api) {
+      const aiProvider = await AIProvider.findOne({ _id: req.params.id, userId: req.user._id });
+      if (!aiProvider) return res.status(404).json({ success: false, message: 'API not found' });
+      isAI = true;
+      api = {
+        _id: aiProvider._id,
+        apiName: aiProvider.providerName,
+        apiUrl: aiProvider.baseUrl || 'https://api.openai.com/v1/models',
+        method: 'AI',
+        lastStatus: aiProvider.lastStatus || 'healthy',
+        uptimePercentage: aiProvider.uptimePercentage || 100,
+        healthScore: aiProvider.healthScore,
+        toObject: () => ({
+          _id: aiProvider._id,
+          apiName: aiProvider.providerName,
+          apiUrl: aiProvider.baseUrl || 'https://api.openai.com/v1/models',
+          method: 'AI',
+          lastStatus: aiProvider.lastStatus || 'healthy',
+          uptimePercentage: aiProvider.uptimePercentage || 100,
+          healthScore: aiProvider.healthScore,
+        }),
+      };
+    }
 
     const safeApi = api.toObject();
     if (safeApi.authentication) {
       safeApi.authentication = { type: safeApi.authentication.type };
     }
 
-    const logs = await Log.find({ apiId: req.params.id })
-      .sort({ checkedAt: -1 })
-      .limit(200)
-      .select('statusCode responseTime success checkedAt errorMessage responseSize contentType rateLimit healthScore responseHeaders errorPayload');
+    let logs = [];
+    if (isAI) {
+      const aiLogs = await AIUsageLog.find({ aiProviderId: req.params.id })
+        .sort({ checkedAt: -1 })
+        .limit(200);
+      logs = aiLogs.map(l => ({
+        statusCode: l.statusCode,
+        responseTime: l.responseTime,
+        success: l.success,
+        checkedAt: l.checkedAt,
+        errorMessage: l.errorMessage,
+        responseSize: l.responseSize,
+        healthScore: null,
+      }));
+    } else {
+      logs = await Log.find({ apiId: req.params.id })
+        .sort({ checkedAt: -1 })
+        .limit(200)
+        .select('statusCode responseTime success checkedAt errorMessage responseSize contentType rateLimit healthScore responseHeaders errorPayload');
+    }
 
     const successLogs = logs.filter(l => l.success);
     const responseTimes = successLogs.map(l => l.responseTime).filter(Boolean).sort((a, b) => a - b);

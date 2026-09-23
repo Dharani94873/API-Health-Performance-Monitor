@@ -49,7 +49,12 @@ export default function DashboardPage() {
 
   const handleDelete = async () => {
     try {
-      await api.delete(`/apis/${deleteModal.id}`);
+      const target = apis.find(a => a._id === deleteModal.id);
+      if (target?.isAI) {
+        await api.delete(`/ai-providers/${deleteModal.id}`);
+      } else {
+        await api.delete(`/apis/${deleteModal.id}`);
+      }
       toast.success('API deleted');
       setDeleteModal({ open: false, id: null, name: '' });
       fetchData();
@@ -60,7 +65,12 @@ export default function DashboardPage() {
 
   const handleToggle = async (id, currentActive) => {
     try {
-      await api.patch(`/apis/${id}/toggle`);
+      const target = apis.find(a => a._id === id);
+      if (target?.isAI) {
+        await api.patch(`/ai-providers/${id}/toggle`);
+      } else {
+        await api.patch(`/apis/${id}/toggle`);
+      }
       toast.success(currentActive ? 'API paused' : 'API activated');
       fetchData();
     } catch {

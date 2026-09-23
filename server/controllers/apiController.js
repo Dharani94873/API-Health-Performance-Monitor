@@ -106,7 +106,41 @@ const getApis = async (req, res, next) => {
       return obj;
     });
 
-    res.json({ success: true, total, page: Number(page), pages: Math.ceil(total / Number(limit)), apis: safeApis });
+    // Also fetch AI providers for unified dashboard view
+    const AIProvider = require('../models/AIProvider');
+    const aiProviders = await AIProvider.find({ userId: req.user._id });
+    
+    let matchingAIs = aiProviders.map(p => ({
+      _id: p._id,
+      apiName: p.providerName,
+      apiUrl: p.baseUrl || 'https://api.openai.com/v1/models',
+      method: 'AI',
+      providerType: p.providerType,
+      model: p.model,
+      isAI: true,
+      active: p.monitoringEnabled,
+      lastStatus: p.lastStatus || 'healthy',
+      lastResponseTime: p.lastResponseTime,
+      lastChecked: p.lastCheckAt,
+      uptimePercentage: p.uptimePercentage ?? 100,
+      healthScore: p.healthScore ?? 95,
+      interval: p.interval,
+      createdAt: p.createdAt,
+      tags: ['AI', (p.providerType || 'LLM').toUpperCase(), p.model || ''].filter(Boolean),
+    }));
+
+    if (search) {
+      const s = search.toLowerCase();
+      matchingAIs = matchingAIs.filter(a => a.apiName.toLowerCase().includes(s) || a.apiUrl.toLowerCase().includes(s));
+    }
+    if (status === 'active') matchingAIs = matchingAIs.filter(a => a.active);
+    if (status === 'inactive') matchingAIs = matchingAIs.filter(a => !a.active);
+    if (status === 'healthy') matchingAIs = matchingAIs.filter(a => a.lastStatus === 'healthy');
+    if (status === 'down') matchingAIs = matchingAIs.filter(a => a.lastStatus === 'down');
+
+    const combinedApis = [...safeApis, ...matchingAIs];
+
+    res.json({ success: true, total: total + matchingAIs.length, page: Number(page), pages: Math.ceil((total + matchingAIs.length) / Number(limit)), apis: combinedApis });
   } catch (error) {
     next(error);
   }
