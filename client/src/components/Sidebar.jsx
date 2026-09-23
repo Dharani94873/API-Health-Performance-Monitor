@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   MdDashboard, MdAdd, MdAnalytics, MdNotifications, MdPerson,
-  MdClose, MdMonitor, MdLogout, MdSettings, MdCompare,
+  MdClose, MdMonitor, MdLogout, MdSettings, MdCompare, MdSmartToy,
 } from 'react-icons/md';
 import { useAuth } from '../context/AuthContext';
 import { getInitials } from '../utils/helpers';
@@ -11,6 +11,7 @@ const navLinks = [
   { to: '/apis/add', icon: MdAdd, label: 'Add API' },
   { to: '/analytics', icon: MdAnalytics, label: 'Analytics' },
   { to: '/compare', icon: MdCompare, label: 'Compare APIs' },
+  { to: '/ai-providers', icon: MdSmartToy, label: 'AI Providers' },
   { to: '/notifications', icon: MdNotifications, label: 'Notifications' },
   { to: '/profile', icon: MdPerson, label: 'Profile' },
 ];

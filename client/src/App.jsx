@@ -19,6 +19,11 @@ import ProfilePage from './pages/ProfilePage';
 import NotFoundPage from './pages/NotFoundPage';
 import CompareApisPage from './pages/CompareApisPage';
 import PublicStatusPage from './pages/PublicStatusPage';
+import AIProvidersPage from './pages/AIProvidersPage';
+import AddAIProviderPage from './pages/AddAIProviderPage';
+import EditAIProviderPage from './pages/EditAIProviderPage';
+import AIProviderDetailPage from './pages/AIProviderDetailPage';
+import CompareAIProvidersPage from './pages/CompareAIProvidersPage';
 
 export default function App() {
   return (
@@ -41,6 +46,12 @@ export default function App() {
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/compare" element={<CompareApisPage />} />
+            {/* AI Provider Monitoring Routes */}
+            <Route path="/ai-providers" element={<AIProvidersPage />} />
+            <Route path="/ai-providers/add" element={<AddAIProviderPage />} />
+            <Route path="/ai-providers/compare" element={<CompareAIProvidersPage />} />
+            <Route path="/ai-providers/:id" element={<AIProviderDetailPage />} />
+            <Route path="/ai-providers/:id/edit" element={<EditAIProviderPage />} />
           </Route>
 
           {/* 404 */}
