@@ -71,7 +71,10 @@ const parseOpenAIUsage = (responseData) => {
  * Returns normalized result object.
  */
 const checkHealth = async ({ apiKey, baseUrl, timeout }) => {
-  const base = (baseUrl || DEFAULT_BASE_URL).replace(/\/$/, '');
+  let base = (baseUrl || DEFAULT_BASE_URL).trim().replace(/\/$/, '');
+  if (base.endsWith('api.openai.co')) {
+    base += 'm';
+  }
   const url = `${base}/v1/models`;
   const startTime = Date.now();
 
