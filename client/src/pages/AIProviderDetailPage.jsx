@@ -72,6 +72,8 @@ export default function AIProviderDetailPage() {
       const res = await api.post(`/ai-providers/${id}/test`);
       setTestResult(res.data.result);
       toast.success('Test complete');
+      // Refresh page data and logs
+      setTimeout(fetchData, 600);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Test failed');
     } finally {

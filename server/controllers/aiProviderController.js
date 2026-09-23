@@ -2,7 +2,7 @@ const AIProvider = require('../models/AIProvider');
 const AIUsageLog = require('../models/AIUsageLog');
 const Alert = require('../models/Alert');
 const { encrypt } = require('../utils/encryption');
-const { testAIProviderNow } = require('../services/aiMonitorService');
+const { testAIProviderNow, checkAIProvider } = require('../services/aiMonitorService');
 const { getProviderCapabilities } = require('../services/aiProviders/providerFactory');
 
 /**
@@ -246,6 +246,10 @@ const testAIProvider = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'AI Provider not found' });
     }
     const result = await testAIProviderNow(aiProvider);
+    if (result.success) {
+      // Also log check asynchronously so metrics and recent logs update
+      checkAIProvider(aiProvider).catch(e => console.error('Error logging test check:', e.message));
+    }
     res.json({ success: true, result });
   } catch (error) {
     next(error);
