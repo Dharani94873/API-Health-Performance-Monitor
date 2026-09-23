@@ -346,10 +346,10 @@ export default function AIProvidersPage() {
                   </div>
                 )}
 
-                {testResult.errorMessage && (
+                {(testResult.errorMessage || testResult.error) && (
                   <div className="bg-red-500/10 rounded-lg p-3 text-sm text-red-400">
                     {testResult.errorType && <span className="font-mono text-xs block mb-1">[{testResult.errorType}]</span>}
-                    {testResult.errorMessage}
+                    {testResult.errorMessage || testResult.error}
                   </div>
                 )}
 

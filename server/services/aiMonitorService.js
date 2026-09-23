@@ -400,6 +400,7 @@ const testAIProviderNow = async (aiProvider) => {
       return {
         success: false,
         error: 'API key not configured or could not be decrypted',
+        errorMessage: 'API key not configured or could not be decrypted. Please edit the provider and re-save your API key.',
         errorType: 'INVALID_CONFIGURATION',
       };
     }
@@ -425,7 +426,8 @@ const testAIProviderNow = async (aiProvider) => {
       responseTime: checkResult.responseTime || (Date.now() - startTime),
       timedOut: checkResult.timedOut || false,
       errorType: checkResult.errorType || null,
-      errorMessage: checkResult.errorMessage || null,
+      errorMessage: checkResult.errorMessage || checkResult.error || null,
+      error: checkResult.error || checkResult.errorMessage || null,
       rateLimits: checkResult.rateLimits || {},
       tokenUsage: checkResult.tokenUsage || null,
       responseSize: checkResult.responseSize || null,
@@ -442,6 +444,7 @@ const testAIProviderNow = async (aiProvider) => {
       timedOut,
       errorType: timedOut ? 'REQUEST_TIMEOUT' : 'PROVIDER_UNAVAILABLE',
       error: err.message,
+      errorMessage: err.message,
     };
   }
 };
