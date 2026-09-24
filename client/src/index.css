@@ -65,6 +65,23 @@
 .text-white {
   color: var(--text-primary) !important;
 }
+.text-pure-white,
+.btn-primary,
+.bg-gradient-to-br,
+.bg-gradient-to-r,
+[class*="from-indigo-"],
+[class*="from-primary-"] {
+  --text-pure: #ffffff;
+}
+
+.text-pure-white,
+.bg-gradient-to-br .text-white,
+.bg-gradient-to-r .text-white,
+[class*="from-indigo-"] .text-white,
+[class*="from-primary-"] .text-white {
+  color: #ffffff !important;
+}
+
 .text-slate-100 {
   color: var(--text-primary) !important;
 }

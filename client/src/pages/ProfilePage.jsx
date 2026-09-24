@@ -85,17 +85,17 @@ export default function ProfilePage() {
       </div>
 
       {/* Public Status Page Card */}
-      <div className="glass-card p-6 border border-primary-500/30 space-y-3 bg-primary-500/5">
-        <h3 className="font-semibold text-white flex items-center gap-2">
+      <div className="glass-card p-6 border border-primary-500/20 space-y-3 bg-primary-50/30">
+        <h3 className="font-semibold text-slate-900 flex items-center gap-2">
           📢 Your Public Status Page
         </h3>
-        <p className="text-xs text-slate-400">Share your live service health with your team or customers without authentication.</p>
+        <p className="text-xs text-slate-500">Share your live service health with your team or customers without authentication.</p>
         <div className="flex items-center gap-2">
           <input
             type="text"
             readOnly
             value={publicStatusUrl}
-            className="input-field py-1.5 text-xs text-slate-300 bg-slate-900/60"
+            className="input-field py-1.5 text-xs text-slate-800 bg-white"
           />
           <button type="button" onClick={copyStatusLink} className="btn-primary text-xs py-1.5 px-3 whitespace-nowrap">
             Copy Link

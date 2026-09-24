@@ -320,8 +320,15 @@ const getPublicStatus = async (req, res, next) => {
 
     const apis = await Api.find({ userId, active: true }).select('apiName method lastStatus uptimePercentage healthScore healthGrade lastChecked tags description maintenance');
 
-    const overallOperational = apis.every(a => a.lastStatus === 'healthy' || a.lastStatus === 'maintenance');
-    const anyDown = apis.some(a => a.lastStatus === 'down');
+    let aiProviders = [];
+    try {
+      const AIProvider = require('../models/AIProvider');
+      aiProviders = await AIProvider.find({ userId, active: true }).select('providerName providerType model lastStatus uptimePercentage healthScore healthGrade lastChecked');
+    } catch (_) {}
+
+    const allServices = [...apis, ...aiProviders];
+    const overallOperational = allServices.length === 0 || allServices.every(a => a.lastStatus === 'healthy' || a.lastStatus === 'maintenance');
+    const anyDown = allServices.some(a => a.lastStatus === 'down');
     const systemStatus = anyDown ? 'Major Outage' : overallOperational ? 'All Systems Operational' : 'Partial Outage / Degraded';
 
     res.json({
@@ -329,6 +336,7 @@ const getPublicStatus = async (req, res, next) => {
       user: { name: user.name, avatar: user.avatar },
       systemStatus,
       apis,
+      aiProviders,
       updatedAt: new Date(),
     });
   } catch (error) {

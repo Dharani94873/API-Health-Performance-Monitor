@@ -98,22 +98,22 @@ export default function LogTable({ logs, loading }) {
 
       {/* Error Payload Modal */}
       {selectedPayload && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
-          <div className="glass-card max-w-2xl w-full p-6 space-y-4 border border-slate-700 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white max-w-2xl w-full p-6 space-y-4 border border-slate-200 shadow-2xl rounded-2xl">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <h3 className="font-bold text-white text-base">Error Response Body</h3>
-                <p className="text-xs text-slate-400">Captured Status Code: {selectedPayload.code || 'N/A'}</p>
+                <h3 className="font-bold text-slate-900 text-base">Error Response Body</h3>
+                <p className="text-xs text-slate-500">Captured Status Code: {selectedPayload.code || 'N/A'}</p>
               </div>
               <button
                 onClick={() => setSelectedPayload(null)}
-                className="p-1 text-slate-400 hover:text-white rounded-lg transition-colors"
+                className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
               >
                 <MdClose size={20} />
               </button>
             </div>
 
-            <pre className="p-4 bg-slate-900 rounded-xl text-xs font-mono text-slate-300 overflow-x-auto max-h-80 border border-slate-800 whitespace-pre-wrap break-all">
+            <pre className="p-4 bg-slate-50 rounded-xl text-xs font-mono text-slate-800 overflow-x-auto max-h-80 border border-slate-200 whitespace-pre-wrap break-all">
               {selectedPayload.payload}
             </pre>
 
