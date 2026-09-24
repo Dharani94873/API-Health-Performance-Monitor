@@ -90,6 +90,9 @@ const createAIProvider = async (req, res, next) => {
       availabilityAlertPct: availabilityAlertPct || 95,
     });
 
+    // Automatically trigger initial AI health check in background
+    checkAIProvider(aiProvider).catch(err => console.error('Initial AI auto-check error:', err.message));
+
     res.status(201).json({
       success: true,
       message: 'AI Provider added successfully',
@@ -128,6 +131,18 @@ const getAIProviders = async (req, res, next) => {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(Number(limit));
+
+    // Automated Background Monitoring: Trigger check for any active AI provider that is due
+    const now = Date.now();
+    for (const p of providers) {
+      if (p.monitoringEnabled) {
+        const intervalMs = (p.interval || 5) * 60 * 1000;
+        const lastCheck = p.lastCheckAt ? new Date(p.lastCheckAt).getTime() : 0;
+        if (!p.lastCheckAt || now - lastCheck >= intervalMs) {
+          checkAIProvider(p).catch(() => {});
+        }
+      }
+    }
 
     res.json({
       success: true,

@@ -60,6 +60,10 @@ const createApi = async (req, res, next) => {
       authentication: authentication ? encryptAuth(authentication) : { type: 'none' },
     });
 
+    // Automatically trigger initial health check in background
+    const { checkApi } = require('../services/monitorService');
+    checkApi(api).catch(err => console.error('Initial auto-check error:', err.message));
+
     res.status(201).json({ success: true, message: 'API added successfully', api });
   } catch (error) {
     next(error);
@@ -97,6 +101,19 @@ const getApis = async (req, res, next) => {
     const total = await Api.countDocuments(query);
     const apis = await Api.find(query).sort(sortQuery).skip(skip).limit(Number(limit));
 
+    // Automated Background Monitoring: Trigger check for any active API that is due or has never been checked
+    const now = Date.now();
+    const { checkApi } = require('../services/monitorService');
+    for (const a of apis) {
+      if (a.active) {
+        const intervalMs = (a.interval || 5) * 60 * 1000;
+        const lastCheck = a.lastChecked ? new Date(a.lastChecked).getTime() : 0;
+        if (!a.lastChecked || now - lastCheck >= intervalMs) {
+          checkApi(a).catch(() => {});
+        }
+      }
+    }
+
     // Strip sensitive encrypted fields from response
     const safeApis = apis.map(a => {
       const obj = a.toObject();
@@ -108,7 +125,19 @@ const getApis = async (req, res, next) => {
 
     // Also fetch AI providers for unified dashboard view
     const AIProvider = require('../models/AIProvider');
+    const { checkAIProvider } = require('../services/aiMonitorService');
     const aiProviders = await AIProvider.find({ userId: req.user._id });
+
+    // Automated Background Monitoring for AI Providers:
+    for (const p of aiProviders) {
+      if (p.monitoringEnabled) {
+        const intervalMs = (p.interval || 5) * 60 * 1000;
+        const lastCheck = p.lastCheckAt ? new Date(p.lastCheckAt).getTime() : 0;
+        if (!p.lastCheckAt || now - lastCheck >= intervalMs) {
+          checkAIProvider(p).catch(() => {});
+        }
+      }
+    }
     
     let matchingAIs = aiProviders.map(p => ({
       _id: p._id,
