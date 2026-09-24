@@ -66,9 +66,11 @@ export default function NotificationsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <MdNotifications className="text-primary-400" size={28} />
+          <MdNotifications className="text-rose-500" size={28} />
           <div>
-            <h1 className="text-2xl font-bold text-white">Notifications</h1>
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight font-heading">
+              System <span className="gradient-text-sunset">Alerts</span>
+            </h1>
             <p className="text-slate-500 text-sm">{total} alerts total</p>
           </div>
         </div>

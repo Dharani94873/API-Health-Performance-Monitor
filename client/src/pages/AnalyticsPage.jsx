@@ -82,7 +82,9 @@ export default function AnalyticsPage() {
         <div className="flex items-center gap-2">
           <MdAnalytics style={{ color: '#6366f1' }} size={28} />
           <div>
-            <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)' }}>Analytics</h1>
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight font-heading">
+              Performance <span className="gradient-text-primary">Analytics</span>
+            </h1>
             <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>Performance insights & trends</p>
           </div>
         </div>

@@ -76,8 +76,10 @@ export default function AddApiPage() {
       <div className="flex items-center gap-3 mb-6">
         <button onClick={() => navigate(-1)} className="btn-secondary p-2"><MdArrowBack size={18} /></button>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)' }}>Add New API</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>Configure an endpoint to monitor</p>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight font-heading">
+            Add New <span className="gradient-text-primary">Endpoint</span>
+          </h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>Configure an endpoint to monitor in real-time</p>
         </div>
       </div>
 

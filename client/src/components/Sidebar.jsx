@@ -39,8 +39,8 @@ export default function Sidebar({ isOpen, onClose }) {
             <MdMonitor className="text-white text-lg" />
           </div>
           <div>
-            <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>API Monitor</p>
-            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Health &amp; Performance</p>
+            <p className="text-sm font-black tracking-tight"><span className="gradient-text font-black">API Monitor</span></p>
+            <p className="text-[11px] font-medium" style={{ color: 'var(--text-muted)' }}>Health &amp; Performance</p>
           </div>
         </div>
         <button onClick={onClose} className="lg:hidden p-1" style={{ color: 'var(--text-muted)' }}>

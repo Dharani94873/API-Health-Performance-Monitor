@@ -81,14 +81,16 @@ export default function LandingPage() {
 
       {/* Features */}
       <section className="relative z-10 max-w-6xl mx-auto px-6 pb-16">
-        <h2 className="text-3xl font-bold text-white text-center mb-10">Everything you need to monitor APIs</h2>
+        <h2 className="text-3xl lg:text-4xl font-black text-slate-900 text-center mb-10 font-heading">
+          Everything you need to <span className="gradient-text">monitor &amp; scale</span> APIs
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {features.map(({ icon: Icon, title, desc, color }) => (
             <div key={title} className="glass-card-hover p-6">
               <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center mb-4`}>
                 <Icon size={24} />
               </div>
-              <h3 className="font-semibold text-white mb-2">{title}</h3>
+              <h3 className="font-bold text-slate-900 mb-2">{title}</h3>
               <p className="text-sm text-slate-500 leading-relaxed">{desc}</p>
             </div>
           ))}
@@ -98,7 +100,9 @@ export default function LandingPage() {
       {/* CTA */}
       <section className="relative z-10 max-w-2xl mx-auto px-6 pb-24 text-center">
         <div className="glass-card p-10 bg-gradient-to-br from-primary-500/10 to-violet-500/10 border-primary-500/20">
-          <h2 className="text-3xl font-bold text-white mb-4">Start monitoring today</h2>
+          <h2 className="text-3xl font-black text-slate-900 mb-4 font-heading">
+            Start monitoring <span className="gradient-text-primary">today</span>
+          </h2>
           <p className="text-slate-400 mb-6">Join developers who trust API Monitor for their critical infrastructure.</p>
           <Link to="/register" className="btn-primary text-base px-8 py-3 inline-flex">
             Create Free Account <MdArrowForward />

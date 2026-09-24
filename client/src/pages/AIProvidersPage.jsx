@@ -113,8 +113,8 @@ export default function AIProvidersPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <MdSmartToy className="text-violet-400" /> AI Provider Monitoring
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2 font-heading">
+            <MdSmartToy className="text-violet-600" /> AI Provider <span className="gradient-text-violet">Intelligence</span>
           </h1>
           <p className="text-slate-500 text-sm mt-1">
             Monitor AI/LLM provider APIs — health, latency, rate limits & usage
@@ -171,7 +171,12 @@ export default function AIProvidersPage() {
       {/* Provider Table */}
       <div>
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
-          <h2 className="font-semibold text-white">Providers ({filtered.length})</h2>
+          <h2 className="font-bold text-slate-900 text-lg flex items-center gap-2 font-heading">
+            Configured <span className="gradient-text-violet">Providers</span>{' '}
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-bold border border-slate-200">
+              {filtered.length}
+            </span>
+          </h2>
           <div className="flex items-center gap-2">
             <div className="relative">
               <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={14} />

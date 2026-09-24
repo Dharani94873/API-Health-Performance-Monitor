@@ -64,30 +64,30 @@ export default function ProfilePage() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <MdPerson className="text-primary-400" /> Profile
+        <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2 font-heading">
+          <MdPerson className="text-primary-500" /> Account <span className="gradient-text-primary">Profile</span>
         </h1>
-        <p className="text-slate-500 text-sm mt-1">Manage your account settings</p>
+        <p className="text-slate-500 text-sm mt-1">Manage your account settings & public status</p>
       </div>
 
       {/* Avatar */}
       <div className="glass-card p-6 flex items-center gap-4">
         <div className="relative">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-500 to-violet-600 flex items-center justify-center text-2xl font-bold text-white">
+          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-500 to-violet-600 flex items-center justify-center text-2xl font-bold text-white shadow-md">
             {getInitials(user?.name)}
           </div>
         </div>
         <div>
-          <p className="text-xl font-semibold text-white">{user?.name}</p>
+          <p className="text-xl font-bold text-slate-900">{user?.name}</p>
           <p className="text-sm text-slate-500">{user?.email}</p>
-          <p className="text-xs text-slate-600 mt-1">Member since {formatDate(user?.createdAt)}</p>
+          <p className="text-xs text-slate-400 mt-1">Member since {formatDate(user?.createdAt)}</p>
         </div>
       </div>
 
       {/* Public Status Page Card */}
       <div className="glass-card p-6 border border-primary-500/20 space-y-3 bg-primary-50/30">
-        <h3 className="font-semibold text-slate-900 flex items-center gap-2">
-          📢 Your Public Status Page
+        <h3 className="font-bold text-slate-900 flex items-center gap-2 font-heading">
+          📢 Your Public <span className="gradient-text-violet">Status Page</span>
         </h3>
         <p className="text-xs text-slate-500">Share your live service health with your team or customers without authentication.</p>
         <div className="flex items-center gap-2">

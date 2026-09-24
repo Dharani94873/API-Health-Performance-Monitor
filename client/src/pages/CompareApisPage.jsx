@@ -62,7 +62,9 @@ export default function CompareApisPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)' }}>API Comparison</h1>
+        <h1 className="text-2xl font-black text-slate-900 tracking-tight font-heading">
+          Compare <span className="gradient-text">API Performance</span>
+        </h1>
         <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>Compare up to 5 APIs side-by-side</p>
       </div>
 

@@ -117,8 +117,8 @@ export default function PublicStatusPage() {
               )}
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-                {user?.name || 'System'}'s Services
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight font-heading">
+                <span className="gradient-text-primary">{user?.name || 'System'}&apos;s</span> Services
               </h1>
               <div className="flex items-center gap-2 mt-0.5">
                 <span className="relative flex h-2 w-2">
@@ -156,7 +156,9 @@ export default function PublicStatusPage() {
             {isOperational ? <BiSolidCheckCircle size={30} /> : <BiSolidXCircle size={30} />}
           </div>
           <div>
-            <h2 className="text-xl font-bold">{systemStatus}</h2>
+            <h2 className={`text-xl font-black font-heading ${isOperational ? 'gradient-text-emerald' : 'gradient-text-sunset'}`}>
+              {systemStatus}
+            </h2>
             <p className={`text-xs font-medium mt-0.5 ${isOperational ? 'text-emerald-700' : 'text-rose-700'}`}>
               {isOperational
                 ? 'All monitored services and microservices are operating with optimal health.'
@@ -280,7 +282,7 @@ export default function PublicStatusPage() {
       <footer className="max-w-4xl mx-auto w-full text-center pt-10 pb-4 text-xs text-slate-500 border-t border-slate-200/80 mt-10 flex flex-col sm:flex-row items-center justify-between gap-2">
         <p>
           Powered by{' '}
-          <Link to="/" className="font-bold text-indigo-600 hover:text-indigo-700 transition-colors">
+          <Link to="/" className="font-extrabold gradient-text-primary hover:opacity-80 transition-opacity">
             API Health & Performance Monitor
           </Link>
         </p>

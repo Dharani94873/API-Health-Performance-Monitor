@@ -111,8 +111,8 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <MdDashboard className="text-primary-400" /> Dashboard
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2 font-heading">
+            <MdDashboard className="text-primary-500" /> API Health <span className="gradient-text">Dashboard</span>
           </h1>
           <p className="text-slate-500 text-sm mt-1">
             {analytics ? `Last updated ${timeAgo(analytics.lastChecked)}` : 'Loading...'}
@@ -199,7 +199,12 @@ export default function DashboardPage() {
       {/* API List */}
       <div>
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
-          <h2 className="font-semibold text-white">Your APIs ({filteredApis.length})</h2>
+          <h2 className="font-bold text-slate-900 text-lg flex items-center gap-2 font-heading">
+            Monitored <span className="gradient-text-primary">Services</span>{' '}
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-bold border border-slate-200">
+              {filteredApis.length}
+            </span>
+          </h2>
           <div className="flex flex-wrap items-center gap-2">
             {/* Search */}
             <div className="relative">
