@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MdMenu, MdSearch, MdNotifications, MdSunny, MdNightlight } from 'react-icons/md';
+import { MdMenu, MdSearch, MdNotifications } from 'react-icons/md';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
 import api from '../services/api';
 
 export default function TopNav({ onMenuClick }) {
   const { user } = useAuth();
-  const { isDark, toggleTheme } = useTheme();
   const [unreadCount, setUnreadCount] = useState(0);
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
@@ -67,16 +65,6 @@ export default function TopNav({ onMenuClick }) {
 
       {/* Right */}
       <div className="flex items-center gap-2">
-        {/* Theme toggle */}
-        <button
-          onClick={toggleTheme}
-          className="p-2 rounded-xl transition-all"
-          style={{ color: 'var(--text-muted)' }}
-          title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-        >
-          {isDark ? <MdSunny size={18} /> : <MdNightlight size={18} />}
-        </button>
-
         {/* Notifications */}
         <button
           onClick={() => navigate('/notifications')}
