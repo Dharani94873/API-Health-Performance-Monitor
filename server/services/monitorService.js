@@ -20,9 +20,8 @@ const buildAuthHeaders = (authentication, url) => {
     case 'apiKey': {
       const apiKey = decrypt(authentication.apiKeyEncrypted);
       if (apiKey) {
-        if (authentication.apiKeyLocation === 'query') {
-          const headerName = authentication.apiKeyHeader || 'api_key';
-          params[headerName] = apiKey;
+        if (authentication.apiKeyLocation === 'query' || authentication.apiKeyHeader === 'api_key' || (url && url.includes('api.nasa.gov'))) {
+          params['api_key'] = apiKey;
         } else {
           headers[authentication.apiKeyHeader || 'X-API-Key'] = apiKey;
         }
