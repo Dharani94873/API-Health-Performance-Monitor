@@ -144,14 +144,14 @@ export default function DashboardPage() {
         <StatCard icon={BiSolidCheckCircle} label="Healthy APIs" value={filteredApis.filter(a => a.lastStatus === 'healthy').length} color="emerald" loading={loading} />
         <StatCard icon={BiSolidXCircle} label="Failed APIs" value={filteredApis.filter(a => a.lastStatus === 'down').length} color="red" loading={loading} />
         <StatCard icon={BiSolidTimer} label="Avg Response" value={analytics ? formatMs(analytics.avgResponseTime) : '—'} color="amber" loading={loading} />
-        <StatCard icon={MdDashboard} label="Requests Today" value={analytics?.todayChecks ?? '—'} color="primary" loading={loading} />
+        <StatCard icon={MdDashboard} label="Requests Today" value={analytics?.todayChecks ?? '—'} color="blue" loading={loading} />
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard icon={BiSolidCheckCircle} label="Avg Uptime" value={analytics ? `${analytics.avgAvailability}%` : '—'} color="emerald" loading={loading} />
-        <StatCard icon={BiSolidTimer} label="Fastest API" value={analytics?.fastestApi?.apiName?.slice(0, 12) || '—'} color="primary" loading={loading} />
+        <StatCard icon={BiSolidTimer} label="Fastest API" value={analytics?.fastestApi?.apiName?.slice(0, 12) || '—'} color="cyan" loading={loading} />
         <StatCard icon={BiSolidTimer} label="Slowest API" value={analytics?.slowestApi?.apiName?.slice(0, 12) || '—'} color="amber" loading={loading} />
         <StatCard icon={MdDashboard} label="SSL Warnings" value={analytics?.sslWarnings ?? '—'} color={analytics?.sslWarnings > 0 ? 'red' : 'emerald'} loading={loading} />
-        <StatCard icon={BiSolidCheckCircle} label="Health Score" value={analytics?.avgHealthScore !== null ? `${analytics?.avgHealthScore ?? '—'}/100` : '—'} color="primary" loading={loading} />
+        <StatCard icon={BiSolidCheckCircle} label="Health Score" value={analytics?.avgHealthScore !== null ? `${analytics?.avgHealthScore ?? '—'}/100` : '—'} color="violet" loading={loading} />
       </div>
 
 

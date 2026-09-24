@@ -78,15 +78,33 @@
 .bg-gradient-to-br,
 .bg-gradient-to-r,
 [class*="from-indigo-"],
-[class*="from-primary-"] {
+[class*="from-primary-"],
+[class*="from-emerald-"],
+[class*="from-rose-"],
+[class*="from-red-"],
+[class*="from-amber-"],
+[class*="from-blue-"],
+[class*="from-violet-"],
+[class*="from-cyan-"],
+[class*="from-teal-"] {
   --text-pure: #ffffff;
 }
 
 .text-pure-white,
 .bg-gradient-to-br .text-white,
 .bg-gradient-to-r .text-white,
+.bg-gradient-to-br.text-white,
+.bg-gradient-to-r.text-white,
 [class*="from-indigo-"] .text-white,
-[class*="from-primary-"] .text-white {
+[class*="from-primary-"] .text-white,
+[class*="from-emerald-"] .text-white,
+[class*="from-rose-"] .text-white,
+[class*="from-red-"] .text-white,
+[class*="from-amber-"] .text-white,
+[class*="from-blue-"] .text-white,
+[class*="from-violet-"] .text-white,
+[class*="from-cyan-"] .text-white,
+[class*="from-teal-"] .text-white {
   color: #ffffff !important;
 }
 
