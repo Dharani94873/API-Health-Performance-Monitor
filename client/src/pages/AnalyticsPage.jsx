@@ -94,16 +94,17 @@ export default function AnalyticsPage() {
       {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
         {[
-          { label: 'Total Checks (7d)', value: successCount + failureCount, color: '#6366f1' },
-          { label: 'Success Rate', value: `${successCount + failureCount > 0 ? Math.round(successCount / (successCount + failureCount) * 100) : 0}%`, color: '#10b981' },
-          { label: 'Avg Response', value: formatMs(analytics?.avgResponseTime), color: '#f59e0b' },
-          { label: 'p95 Response', value: formatMs(analytics?.p95ResponseTime), color: '#ec4899' },
-          { label: 'p99 Response', value: formatMs(analytics?.p99ResponseTime), color: '#ef4444' },
-          { label: 'Avg Availability', value: `${analytics?.avgAvailability ?? '—'}%`, color: '#8b5cf6' },
-        ].map(({ label, value, color }) => (
-          <div key={label} className="glass-card p-4">
-            <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>{label}</p>
-            <p style={{ fontSize: 18, fontWeight: 700, color }}>{value}</p>
+          { label: 'Total Checks (7d)', value: successCount + failureCount, textGradient: 'gradient-text-primary', topGradient: 'from-indigo-600 to-violet-600' },
+          { label: 'Success Rate', value: `${successCount + failureCount > 0 ? Math.round(successCount / (successCount + failureCount) * 100) : 0}%`, textGradient: 'gradient-text-emerald', topGradient: 'from-emerald-600 to-teal-500' },
+          { label: 'Avg Response', value: formatMs(analytics?.avgResponseTime), textGradient: 'gradient-text-amber', topGradient: 'from-amber-500 to-orange-500' },
+          { label: 'p95 Response', value: formatMs(analytics?.p95ResponseTime), textGradient: 'gradient-text-sunset', topGradient: 'from-pink-500 to-rose-500' },
+          { label: 'p99 Response', value: formatMs(analytics?.p99ResponseTime), textGradient: 'gradient-text-sunset', topGradient: 'from-rose-600 to-red-500' },
+          { label: 'Avg Availability', value: `${analytics?.avgAvailability ?? '—'}%`, textGradient: 'gradient-text-violet', topGradient: 'from-violet-600 to-purple-600' },
+        ].map(({ label, value, textGradient, topGradient }) => (
+          <div key={label} className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-sm relative overflow-hidden group hover:shadow-md transition-all">
+            <div className={`h-1 w-full absolute top-0 left-0 bg-gradient-to-r ${topGradient}`} />
+            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">{label}</p>
+            <p className={`text-xl font-black font-heading tracking-tight ${textGradient}`}>{value}</p>
           </div>
         ))}
       </div>
